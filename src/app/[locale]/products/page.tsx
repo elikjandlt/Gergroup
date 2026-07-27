@@ -2,13 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PageLoader } from "@/components/common/Loader";
 import { cn } from "@/lib/utils";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
 import type { Product } from "@/graphql/ecommerce/queries/product";
 
 const MOCK_PRODUCTS: Product[] = [
@@ -44,31 +43,28 @@ const CATEGORIES = ["Хөөс", "Түгжээ", "Хуванцар тавцан",
 
 type SortOption = "featured" | "price-asc" | "price-desc" | "name";
 
+function getProductCategory(name?: string | null) {
+  if (!name) return "";
+  if (name.includes("ХӨӨС")) return "Хөөс";
+  if (name.includes("ТҮГЖЭЭ")) return "Түгжээ";
+  if (name.includes("ТАВЦАН")) return "Хуванцар тавцан";
+  if (name.includes("АМАЛГАА") || name.includes("АМАЛГААНЫ")) return "Хуванцар амалгаа";
+  if (name.includes("УС УУР ЧИЙГ ТУСГААРЛАГЧ")) return "Ус уур чийг тусгаарлагч";
+  if (name.includes("РЕЗИН")) return "Резин";
+  return "";
+}
+
 export default function ProductsPage() {
   const t = useTranslations();
   const [searchValue, setSearchValue] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Хөөс");
   const [sortBy, setSortBy] = useState<SortOption>("featured");
   const [page, setPage] = useState(1);
-
-  const categoryCount = useMemo(() => {
-    return CATEGORIES.map((cat) => {
-      const count = MOCK_PRODUCTS.filter((p) => {
-        if (cat === "Хөөс") return p.name?.toLowerCase().includes("хөөс");
-        if (cat === "Түгжээ") return p.name?.includes("ТҮГЖЭЭ");
-        if (cat === "Хуванцар тавцан") return p.name?.includes("ТАВЦАН");
-        if (cat === "Хуванцар амалгаа") return p.name?.includes("АМАЛГАА") || p.name?.includes("АМАЛГААНЫ");
-        if (cat === "Ус уур чийг тусгаарлагч") return p.name?.includes("УС УУР ЧИЙГ ТУСГААРЛАГЧ");
-        if (cat === "Резин") return p.name?.includes("РЕЗИН");
-        return false;
-      }).length;
-      return { name: cat, count };
-    });
-  }, []);
+  const [showFilters, setShowFilters] = useState(true);
 
   const filtered = useMemo(() => {
     let result = MOCK_PRODUCTS.filter((p) => {
-      const matchesSearch = p.name?.toLowerCase().includes(searchValue.toLowerCase());
+      const matchesSearch = !searchValue || p.name?.toLowerCase().includes(searchValue.toLowerCase());
       const matchesCategory =
         (selectedCategory === "Хөөс" && p.name?.toLowerCase().includes("хөөс")) ||
         (selectedCategory === "Түгжээ" && p.name?.includes("ТҮГЖЭЭ")) ||
@@ -108,49 +104,28 @@ export default function ProductsPage() {
   return (
     <div className="mx-auto w-full max-w-[1440px] px-10 py-16">
       {/* Page header */}
-      <div className="mb-10 flex flex-col gap-2 border-b border-border pb-8 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("products.categories")}</p>
-          <h1 className="mt-1 text-[28px] font-normal">{t("products.title")}</h1>
-        </div>
-        <p className="text-[13px] text-muted-foreground">
-          {filtered.length} {t("products.count")}
-        </p>
-      </div>
+      <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <h1 className="text-[28px] font-normal">
+          {selectedCategory} <span className="text-muted-foreground">({filtered.length})</span>
+        </h1>
 
-      {/* Controls */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative w-full sm:max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder={t("products.searchPlaceholder")}
-            value={searchValue}
-            onChange={(e) => {
-              setSearchValue(e.target.value);
-              setPage(1);
-            }}
-            className="h-11 pl-10"
-          />
-          {searchValue && (
-            <button
-              onClick={() => setSearchValue("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
+        <div className="flex items-center gap-6">
+          <button
+            onClick={() => setShowFilters((s) => !s)}
+            className="hidden items-center gap-2 text-[15px] transition-opacity hover:opacity-70 lg:flex"
+          >
+            {showFilters ? "Шүүлтүүр нуух" : "Шүүлтүүр харуулах"}
+            <SlidersHorizontal className="h-4 w-4" />
+          </button>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 border border-border px-3 py-2">
-            <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+          <div className="relative">
             <select
               value={sortBy}
               onChange={(e) => {
                 setSortBy(e.target.value as SortOption);
                 setPage(1);
               }}
-              className="bg-transparent text-[13px] outline-none"
+              className="appearance-none bg-transparent pr-6 text-[15px] outline-none"
             >
               {(Object.keys(sortLabel) as SortOption[]).map((key) => (
                 <option key={key} value={key}>
@@ -158,40 +133,62 @@ export default function ProductsPage() {
                 </option>
               ))}
             </select>
+            <ChevronDown className="pointer-events-none absolute right-0 top-1/2 h-4 w-4 -translate-y-1/2" />
           </div>
         </div>
       </div>
 
-      <div className="flex flex-col gap-8 lg:flex-row">
+      <div className="flex flex-col gap-10 lg:flex-row">
         {/* Sidebar */}
-        <aside className="w-full lg:w-64 lg:sticky lg:top-24 lg:self-start">
-          <p className="mb-4 text-[11px] uppercase tracking-wider text-muted-foreground">{t("products.categories")}</p>
-          <div className="flex flex-wrap gap-2 lg:flex-col lg:flex-nowrap">
-            {categoryCount.map(({ name, count }) => {
-              const active = selectedCategory === name;
-              return (
-                <button
-                  key={name}
-                  onClick={() => {
-                    setSelectedCategory(name);
+        {showFilters && (
+          <aside className="w-full lg:w-60 lg:flex-shrink-0">
+            <div className="mb-8">
+              <div className="relative">
+                <Search className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder={t("products.searchPlaceholder")}
+                  value={searchValue}
+                  onChange={(e) => {
+                    setSearchValue(e.target.value);
                     setPage(1);
                   }}
-                  className={cn(
-                    "flex flex-1 items-center justify-between border px-4 py-3 text-left text-[13px] transition-colors lg:flex-none",
-                    active
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border hover:border-foreground"
-                  )}
-                >
-                  <span>{name}</span>
-                  <span className={cn("ml-3 text-[11px]", active ? "text-background/70" : "text-muted-foreground")}>
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </aside>
+                  className="border-0 border-b border-border rounded-none pl-6 focus-visible:ring-0 focus-visible:ring-offset-0"
+                />
+                {searchValue && (
+                  <button
+                    onClick={() => setSearchValue("")}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <nav>
+              <ul className="flex flex-col gap-3">
+                {CATEGORIES.map((cat) => (
+                  <li key={cat}>
+                    <button
+                      onClick={() => {
+                        setSelectedCategory(cat);
+                        setPage(1);
+                      }}
+                      className={cn(
+                        "text-left text-[15px] transition-colors",
+                        selectedCategory === cat
+                          ? "font-semibold text-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      {cat}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </aside>
+        )}
 
         {/* Main content */}
         <div className="flex-1">
@@ -208,14 +205,19 @@ export default function ProductsPage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-x-4 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
                 {paginated.map((product, i) => (
-                  <ProductCard key={product._id} product={product} index={i} />
+                  <ProductCard
+                    key={product._id}
+                    product={product}
+                    index={i}
+                    category={getProductCategory(product.name)}
+                  />
                 ))}
               </div>
 
               {totalPages > 1 && (
-                <div className="mt-12 flex items-center justify-center gap-2">
+                <div className="mt-14 flex items-center justify-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"

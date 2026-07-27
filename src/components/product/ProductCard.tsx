@@ -9,7 +9,15 @@ import Image from "@/components/common/Image";
 import { Button } from "@/components/ui/button";
 import type { Product } from "@/graphql/ecommerce/queries/product";
 
-export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
+export function ProductCard({
+  product,
+  category,
+  index = 0,
+}: {
+  product: Product;
+  category?: string;
+  index?: number;
+}) {
   const [cartItems, setCartItems] = useAtom(cartItemsAtom);
 
   const addToCart = (e: React.MouseEvent) => {
@@ -39,32 +47,43 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
   };
 
   return (
-    <motion.div
+    <motion.article
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.35, ease: "easeOut", delay: index * 0.05 }}
-      className="group flex flex-col border border-border bg-background transition-colors hover:border-foreground"
+      className="group flex flex-col gap-3"
     >
-      <Link href={`/products/${product._id}`} className="relative block aspect-[3/4] overflow-hidden bg-muted">
+      <Link
+        href={`/products/${product._id}`}
+        className="relative aspect-square overflow-hidden bg-muted"
+      >
         <Image
           src={product.attachment?.url}
           alt={product.name || ""}
           fill
-          className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.04]"
+          className="object-contain p-6 transition-transform duration-300 ease-out group-hover:scale-[1.04]"
         />
       </Link>
-      <div className="flex flex-1 flex-col gap-3 border-t border-border p-4">
-        <Link href={`/products/${product._id}`} className="flex-1">
-          <h3 className="text-[14px] font-medium leading-snug transition-colors group-hover:text-muted-foreground">
+
+      <div className="flex flex-col gap-1 px-1">
+        {category && <p className="text-[13px] text-muted-foreground">{category}</p>}
+        <Link href={`/products/${product._id}`}>
+          <h3 className="text-[15px] font-medium leading-snug transition-colors group-hover:text-muted-foreground">
             {product.name}
           </h3>
-          <p className="mt-2 text-[14px] font-semibold">{formatPrice(product.unitPrice)}</p>
         </Link>
-        <Button onClick={addToCart} variant="outline" size="sm" className="w-full">
-          Сагсанд нэмэх
-        </Button>
+        <p className="text-[15px] font-medium">{formatPrice(product.unitPrice)}</p>
       </div>
-    </motion.div>
+
+      <Button
+        onClick={addToCart}
+        variant="outline"
+        size="sm"
+        className="mx-1 w-[calc(100%-8px)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+      >
+        Сагсанд нэмэх
+      </Button>
+    </motion.article>
   );
 }

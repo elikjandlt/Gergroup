@@ -100,7 +100,7 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.35, delay: i * 0.05, ease: "easeOut" }}
-              className="border border-border bg-background p-3 transition-colors hover:border-foreground"
+              className="overflow-hidden rounded-2xl border border-border bg-background p-3 transition-colors hover:border-foreground"
             >
               <Link
                 href={`/products?category=${encodeURIComponent(cat.slug)}`}

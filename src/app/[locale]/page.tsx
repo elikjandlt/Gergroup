@@ -3,13 +3,15 @@
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Link } from "@/i18n/routing";
-import { ProductCard } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "@/components/common/Image";
-import { Truck, ShieldCheck, Headphones, Lock } from "lucide-react";
+import { Truck, ShieldCheck, Headphones, Lock, ArrowRight, ShoppingBag } from "lucide-react";
 import type { Product } from "@/graphql/ecommerce/queries/product";
+import { cartItemsAtom } from "@/store/cart.store";
+import { useAtom } from "jotai";
+import { formatPrice } from "@/lib/utils";
 
 const FEATURED_PRODUCTS: Product[] = [
   { _id: "block-khoos", name: "БЛОКНЫ ХӨӨС", unitPrice: 45000, attachment: { url: "/images/products/block-foam.jpg" } },
@@ -31,6 +33,84 @@ const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" as const } },
 };
+
+function getProductCategory(name?: string | null) {
+  if (!name) return "";
+  if (name.includes("ХӨӨС")) return "Хөөс";
+  if (name.includes("ТҮГЖЭЭ")) return "Түгжээ";
+  if (name.includes("ТАВЦАН")) return "Хуванцар тавцан";
+  if (name.includes("АМАЛГАА") || name.includes("АМАЛГААНЫ")) return "Хуванцар амалгаа";
+  if (name.includes("УС УУР ЧИЙГ ТУСГААРЛАГЧ")) return "Ус уур чийг тусгаарлагч";
+  if (name.includes("РЕЗИН")) return "Резин";
+  return "";
+}
+
+function FeaturedProductCard({ product, index }: { product: Product; index: number }) {
+  const [, setCartItems] = useAtom(cartItemsAtom);
+
+  const addToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const existing = false; // Simplified for featured card
+    setCartItems((prev) => {
+      const existingItem = prev.find((item) => item.productId === product._id);
+      if (existingItem) {
+        return prev.map((item) =>
+          item.productId === product._id ? { ...item, count: item.count + 1 } : item
+        );
+      }
+      return [
+        ...prev,
+        {
+          productId: product._id,
+          count: 1,
+          unitPrice: product.unitPrice || 0,
+          productName: product.name,
+          productImgUrl: product.attachment?.url,
+        },
+      ];
+    });
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.4, delay: index * 0.08, ease: "easeOut" }}
+      className="group flex flex-col"
+    >
+      <Link href={`/products/${product._id}`} className="relative flex aspect-square items-center justify-center overflow-hidden bg-muted p-6">
+        <Image
+          src={product.attachment?.url}
+          alt={product.name || ""}
+          fill
+          className="object-contain p-6 transition-transform duration-500 ease-out group-hover:scale-[1.05]"
+        />
+      </Link>
+      <div className="mt-4 flex flex-1 flex-col">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+          {getProductCategory(product.name)}
+        </p>
+        <Link href={`/products/${product._id}`}>
+          <h3 className="mt-1 text-[15px] font-semibold leading-snug transition-colors group-hover:text-muted-foreground">
+            {product.name}
+          </h3>
+        </Link>
+        <p className="mt-2 text-[15px] font-semibold">{formatPrice(product.unitPrice)}</p>
+        <Button
+          onClick={addToCart}
+          variant="default"
+          size="sm"
+          className="mt-4 w-full gap-2 text-[12px] font-semibold uppercase tracking-wider opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        >
+          <ShoppingBag className="h-3.5 w-3.5" />
+          Сагсанд нэмэх
+        </Button>
+      </div>
+    </motion.div>
+  );
+}
 
 export default function HomePage() {
   const t = useTranslations();
@@ -131,13 +211,24 @@ export default function HomePage() {
         variants={sectionVariants}
         className="mx-auto w-full max-w-[1440px] px-10 pb-[120px]"
       >
-        <div className="mb-8 flex items-end justify-between">
-          <h2 className="text-[28px] font-normal">{t("home.featured")}</h2>
-          <Link href="/products" className="text-[13px] underline">{t("home.viewAll")}</Link>
+        <div className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Бидний санал болгож буй
+            </p>
+            <h2 className="mt-2 text-[28px] font-bold">{t("home.featured")}</h2>
+          </div>
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-2 text-[14px] font-semibold underline underline-offset-4 transition-opacity hover:opacity-70"
+          >
+            {t("home.viewAll")}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURED_PRODUCTS.map((product, i) => (
-            <ProductCard key={product._id} product={product} index={i} />
+            <FeaturedProductCard key={product._id} product={product} index={i} />
           ))}
         </div>
       </motion.section>

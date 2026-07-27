@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ProductCard } from "@/components/product/ProductCard";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PageLoader } from "@/components/common/Loader";
 import { cn } from "@/lib/utils";
@@ -105,14 +104,14 @@ export default function ProductsPage() {
     <div className="mx-auto w-full max-w-[1440px] px-10 py-16">
       {/* Page header */}
       <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <h1 className="text-[28px] font-normal">
+        <h1 className="text-[32px] font-bold">
           {selectedCategory} <span className="text-muted-foreground">({filtered.length})</span>
         </h1>
 
         <div className="flex items-center gap-6">
           <button
             onClick={() => setShowFilters((s) => !s)}
-            className="hidden items-center gap-2 text-[15px] transition-opacity hover:opacity-70 lg:flex"
+            className="hidden items-center gap-2 text-[15px] font-semibold transition-opacity hover:opacity-70 lg:flex"
           >
             {showFilters ? "Шүүлтүүр нуух" : "Шүүлтүүр харуулах"}
             <SlidersHorizontal className="h-4 w-4" />
@@ -125,7 +124,7 @@ export default function ProductsPage() {
                 setSortBy(e.target.value as SortOption);
                 setPage(1);
               }}
-              className="appearance-none bg-transparent pr-6 text-[15px] outline-none"
+              className="appearance-none bg-transparent pr-6 text-[15px] font-semibold outline-none"
             >
               {(Object.keys(sortLabel) as SortOption[]).map((key) => (
                 <option key={key} value={key}>
@@ -152,12 +151,12 @@ export default function ProductsPage() {
                     setSearchValue(e.target.value);
                     setPage(1);
                   }}
-                  className="border-0 border-b border-border rounded-none pl-6 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="h-11 border-0 bg-muted px-6 focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
                 {searchValue && (
                   <button
                     onClick={() => setSearchValue("")}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -175,10 +174,10 @@ export default function ProductsPage() {
                         setPage(1);
                       }}
                       className={cn(
-                        "text-left text-[15px] transition-colors",
+                        "text-left text-[16px] transition-colors",
                         selectedCategory === cat
-                          ? "font-semibold text-foreground"
-                          : "text-muted-foreground hover:text-foreground"
+                          ? "font-bold text-foreground"
+                          : "font-medium text-muted-foreground hover:text-foreground"
                       )}
                     >
                       {cat}
@@ -197,11 +196,14 @@ export default function ProductsPage() {
               <PageLoader />
             </div>
           ) : paginated.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-4 border border-dashed border-border py-24 text-center">
-              <p className="text-[14px] text-muted-foreground">{t("products.notFound")}</p>
-              <Button variant="outline" size="sm" onClick={clearFilters}>
+            <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
+              <p className="text-[16px] font-medium text-muted-foreground">{t("products.notFound")}</p>
+              <button
+                onClick={clearFilters}
+                className="text-[15px] font-semibold underline underline-offset-4 transition-opacity hover:opacity-70"
+              >
                 {t("products.clearFilters")}
-              </Button>
+              </button>
             </div>
           ) : (
             <>
@@ -217,34 +219,35 @@ export default function ProductsPage() {
               </div>
 
               {totalPages > 1 && (
-                <div className="mt-14 flex items-center justify-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
+                <div className="mt-14 flex items-center justify-center gap-4">
+                  <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page <= 1}
+                    className="text-[15px] font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
                   >
                     {t("common.previous")}
-                  </Button>
+                  </button>
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                    <Button
+                    <button
                       key={p}
-                      variant={page === p ? "default" : "outline"}
-                      size="sm"
                       onClick={() => setPage(p)}
-                      className="min-w-[40px]"
+                      className={cn(
+                        "min-w-[28px] text-[15px] font-semibold transition-colors",
+                        page === p
+                          ? "text-foreground underline underline-offset-4"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
                     >
                       {p}
-                    </Button>
+                    </button>
                   ))}
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  <button
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page >= totalPages}
+                    className="text-[15px] font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
                   >
                     {t("common.next")}
-                  </Button>
+                  </button>
                 </div>
               )}
             </>

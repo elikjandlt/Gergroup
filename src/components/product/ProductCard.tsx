@@ -66,21 +66,21 @@ export function ProductCard({
         />
       </Link>
 
-      <div className="flex flex-col gap-1 px-1">
-        {category && <p className="text-[13px] text-muted-foreground">{category}</p>}
+      <div className="flex flex-col gap-1.5 px-1">
+        {category && <p className="text-[12px] uppercase tracking-wider text-muted-foreground">{category}</p>}
         <Link href={`/products/${product._id}`}>
-          <h3 className="text-[15px] font-medium leading-snug transition-colors group-hover:text-muted-foreground">
+          <h3 className="text-[16px] font-semibold leading-snug transition-colors group-hover:text-muted-foreground">
             {product.name}
           </h3>
         </Link>
-        <p className="text-[15px] font-medium">{formatPrice(product.unitPrice)}</p>
+        <p className="text-[15px] font-semibold">{formatPrice(product.unitPrice)}</p>
       </div>
 
       <Button
         onClick={addToCart}
-        variant="outline"
+        variant="default"
         size="sm"
-        className="mx-1 w-[calc(100%-8px)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        className="mx-1 w-[calc(100%-8px)] border-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
       >
         Сагсанд нэмэх
       </Button>

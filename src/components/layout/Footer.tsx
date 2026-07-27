@@ -24,6 +24,7 @@ export async function Footer() {
         <div className="flex flex-col gap-4">
           <span className="text-[11px] uppercase text-muted-foreground">{t("footer.help")}</span>
           <Link href="/contact" className="text-[13px] hover:text-muted-foreground">{t("home.contact")}</Link>
+          <Link href="/news" className="text-[13px] hover:text-muted-foreground">{t("nav.news")}</Link>
           <Link href="/orders" className="text-[13px] hover:text-muted-foreground">{t("orders.title")}</Link>
           <Link href="/profile" className="text-[13px] hover:text-muted-foreground">{t("nav.profile")}</Link>
         </div>

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "@/components/common/Image";
-import { Truck, ShieldCheck, Headphones, Lock, ArrowRight, ShoppingBag } from "lucide-react";
+import { Truck, ShieldCheck, Headphones, Lock, ArrowRight, ShoppingBag, Check, Clock, Mail, Phone } from "lucide-react";
 import type { Product } from "@/graphql/ecommerce/queries/product";
 import { cartItemsAtom } from "@/store/cart.store";
 import { useAtom } from "jotai";
@@ -239,28 +239,84 @@ export default function HomePage() {
         whileInView="visible"
         viewport={{ once: true, margin: "-80px" }}
         variants={sectionVariants}
-        className="mx-auto w-full max-w-[1440px] px-10 pb-[120px]"
+        className="w-full bg-foreground py-24 text-background"
       >
-        <div className="border border-border p-10 text-center">
-          <h2 className="text-[24px] font-normal">{t("home.newsletter")}</h2>
-          <p className="mx-auto mt-3 max-w-md text-[13px] text-muted-foreground">{t("home.newsletterText")}</p>
-          <form
-            className="mx-auto mt-6 flex max-w-xl flex-col gap-4 text-left"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Input type="text" placeholder="Нэр" />
-              <Input type="tel" placeholder="Утас" />
+        <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-16 px-10 lg:grid-cols-2">
+          <div className="flex flex-col justify-center">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-background/60">
+              Мэргэжлийн зөвлөгөө
+            </p>
+            <h2 className="mt-3 text-[32px] font-bold leading-tight sm:text-[40px]">
+              {t("home.newsletter")}
+            </h2>
+            <p className="mt-4 max-w-md text-[15px] leading-relaxed text-background/70">
+              {t("home.newsletterText")}
+            </p>
+
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {[
+                { icon: Clock, text: "24 цагийн дотор" },
+                { icon: Phone, text: "Утасаар холбогдох" },
+                { icon: Mail, text: "Имэйлээр илгээх" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center bg-background/10">
+                    <item.icon className="h-5 w-5" />
+                  </div>
+                  <p className="text-[13px] font-medium">{item.text}</p>
+                </div>
+              ))}
             </div>
-            <Input type="email" placeholder="Имэйл (заавал биш)" />
-            <Textarea
-              placeholder="Төслийн тайлбар, тоо хэмжээ, хэмжээ гэх мэт..."
-              className="min-h-[120px]"
-            />
-            <Button type="submit" className="self-center text-[13px] uppercase tracking-wider">
-              {t("home.subscribe")}
-            </Button>
-          </form>
+          </div>
+
+          <div className="bg-background p-8 text-foreground sm:p-10">
+            <form className="flex flex-col gap-5" onSubmit={(e) => e.preventDefault()}>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Нэр
+                  </label>
+                  <Input type="text" placeholder="Таны нэр" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Утас
+                  </label>
+                  <Input type="tel" placeholder="Таны утас" />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Имэйл
+                </label>
+                <Input type="email" placeholder="Таны имэйл (заавал биш)" />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Төслийн тайлбар
+                </label>
+                <Textarea
+                  placeholder="Төслийн тайлбар, тоо хэмжээ, хэмжээ гэх мэт..."
+                  className="min-h-[140px]"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="mt-2 h-12 w-full gap-2 text-[14px] font-semibold uppercase tracking-wider"
+              >
+                {t("home.subscribe")}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+
+              <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+                <Check className="h-4 w-4" />
+                <span>Мэдээлэл нь нууцлагдана</span>
+              </div>
+            </form>
+          </div>
         </div>
       </motion.section>
     </div>

@@ -41,8 +41,8 @@
   },
   "typography": {
     "families": {
-      "display": "Manrope",
-      "body": "Manrope",
+      "display": "Inter",
+      "body": "Inter",
       "mono": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
     },
     "scale": {

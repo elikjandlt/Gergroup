@@ -10,7 +10,7 @@
 - **Selected homepage option:** C — Bold Reinterpretation
 - **Motion level:** 1 (Polished)
 - **Palette:** `#ffffff` canvas, `#000000` ink/borders, `#757575` stone
-- **Typography:** Manrope, weights 400–700, compact scale 11–120px
+- **Typography:** Inter, weights 100–900, compact scale 11–120px
 - **Corners:** 0px on every component
 - **Shadows/gradients:** None
 
@@ -28,7 +28,7 @@
   - `output/gun/designs/homepage-directions.pen`
   - `output/gun/designs/design.pen`
 - Confirmation: homepage previews covered the full homepage section flow (hero, categories, best-sellers, testimonials, contact, footer).
-- Locked constraints: keep the black/white/stone palette only, 0px radius everywhere, Manrope font, no shadows, no gradients.
+- Locked constraints: keep the black/white/stone palette only, 0px radius everywhere, Inter font, no shadows, no gradients.
 
 ## Source Website Inventory
 
@@ -38,7 +38,7 @@
 
 ## Chosen Fonts
 
-- **Manrope** — display, body, UI labels, buttons. Chosen for its clarity, modern geometric feel, and excellent Cyrillic support.
+- **Inter** — display, body, UI labels, buttons. Chosen for its neutrality, excellent Cyrillic support, and clean modern feel.
 - No decorative serif is used for UI text; the GUN logotype itself is the only display typographic moment.
 
 ## Chosen Libraries
@@ -160,7 +160,7 @@ pnpm add framer-motion clsx tailwind-merge lucide-react next-themes
 
 - Black/white/stone color system
 - 0px corner radius on every element
-- Manrope font family
+- Inter font family
 - GUN logotype letter-spacing and weight
 - Editorial photography-first layout
 - No shadows, no gradients

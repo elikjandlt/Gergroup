@@ -83,32 +83,42 @@ export default function HomePage() {
         variants={sectionVariants}
         className="mx-auto w-full max-w-[1440px] px-10 pb-[120px]"
       >
-        <div className="mb-8 flex items-end justify-between">
-          <h2 className="text-[28px] font-normal">{t("home.categories")}</h2>
-          <Link href="/products" className="text-[13px] underline">{t("home.viewAll")}</Link>
+        <div className="mb-10 flex items-end justify-between">
+          <div>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Бүтээгдэхүүний ангилал</p>
+            <h2 className="mt-2 text-[28px] font-bold">{t("home.categories")}</h2>
+          </div>
+          <Link href="/products" className="text-[14px] font-semibold underline underline-offset-4 transition-opacity hover:opacity-70">
+            {t("home.viewAll")}
+          </Link>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {CATEGORIES.map((cat, i) => (
             <motion.div
               key={cat.slug}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.35, delay: i * 0.05, ease: "easeOut" }}
+              transition={{ duration: 0.35, delay: i * 0.08, ease: "easeOut" }}
             >
               <Link
                 href={`/products?category=${encodeURIComponent(cat.slug)}`}
-                className="group relative flex aspect-square flex-col justify-end overflow-hidden bg-muted"
+                className="group relative flex aspect-[4/3] flex-col justify-end overflow-hidden bg-muted"
               >
                 <Image
                   src={cat.image}
                   alt={cat.name}
                   fill
-                  className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.05]"
+                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="relative p-4 text-white">
-                  <p className="text-[13px] font-normal">{cat.name}</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-foreground/0 transition-colors duration-300 group-hover:bg-foreground/10" />
+                <div className="relative p-6 text-white">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] opacity-80">{i + 1 < 10 ? `0${i + 1}` : i + 1}</p>
+                  <p className="mt-1 text-[20px] font-semibold">{cat.name}</p>
+                  <p className="mt-2 inline-flex items-center text-[13px] font-medium opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    Бүтээгдэхүүн харах <span className="ml-2">→</span>
+                  </p>
                 </div>
               </Link>
             </motion.div>

@@ -63,7 +63,7 @@ export async function Footer() {
   const t = await getTranslations();
 
   return (
-    <footer className="w-full bg-foreground text-background">
+    <footer className="w-full bg-blue-600 text-white">
       <div className="mx-auto max-w-[1440px] px-6 py-16 sm:px-10 lg:py-24">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-10">
           {/* Brand & contact */}
@@ -80,7 +80,7 @@ export async function Footer() {
             <div className="flex flex-col gap-4">
               {contactItems.map((item) => (
                 <div key={item.label} className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-blue-400">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
                     <item.icon className="h-5 w-5" />
                   </div>
                   <div className="flex flex-col">
@@ -90,7 +90,7 @@ export async function Footer() {
                     {item.href ? (
                       <a
                         href={item.href}
-                        className="mt-1 text-[15px] font-medium text-white transition-colors hover:text-blue-400"
+                        className="mt-1 text-[15px] font-medium text-white transition-colors hover:text-white/80"
                       >
                         {item.value}
                       </a>
@@ -153,7 +153,7 @@ export async function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-blue-600 hover:text-white"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-blue-600"
               >
                 <FacebookIcon className="h-5 w-5" />
               </a>
@@ -162,7 +162,7 @@ export async function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-blue-600 hover:text-white"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-blue-600"
               >
                 <InstagramIcon className="h-5 w-5" />
               </a>
@@ -171,7 +171,7 @@ export async function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="YouTube"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-blue-600 hover:text-white"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-blue-600"
               >
                 <YoutubeIcon className="h-5 w-5" />
               </a>
@@ -180,7 +180,7 @@ export async function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-blue-600 hover:text-white"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-blue-600"
               >
                 <LinkedinIcon className="h-5 w-5" />
               </a>

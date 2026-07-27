@@ -30,7 +30,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-10">
-        <Link href="/" className="flex items-center gap-3 text-[20px] font-normal uppercase tracking-[4px] text-[#0077c8]">
+        <Link href="/" className="flex items-center gap-3 text-[20px] font-normal uppercase tracking-[4px] text-primary">
           <Image src="/images/logo.png" alt="Гэр Групп ХХК" width={40} height={40} className="object-contain" unoptimized />
           Гэр Групп ХХК
         </Link>

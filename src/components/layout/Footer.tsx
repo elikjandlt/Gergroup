@@ -63,7 +63,7 @@ export async function Footer() {
   const t = await getTranslations();
 
   return (
-    <footer className="w-full bg-blue-600 text-white">
+    <footer className="w-full bg-primary text-white">
       <div className="mx-auto max-w-[1440px] px-6 py-16 sm:px-10 lg:py-24">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-10">
           {/* Brand & contact */}
@@ -153,7 +153,7 @@ export async function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-blue-600"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-primary"
               >
                 <FacebookIcon className="h-5 w-5" />
               </a>
@@ -162,7 +162,7 @@ export async function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-blue-600"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-primary"
               >
                 <InstagramIcon className="h-5 w-5" />
               </a>
@@ -171,7 +171,7 @@ export async function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="YouTube"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-blue-600"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-primary"
               >
                 <YoutubeIcon className="h-5 w-5" />
               </a>
@@ -180,7 +180,7 @@ export async function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-blue-600"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-primary"
               >
                 <LinkedinIcon className="h-5 w-5" />
               </a>

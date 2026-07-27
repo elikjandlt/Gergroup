@@ -244,7 +244,7 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 px-6 sm:px-10 lg:grid-cols-2">
           {/* Left info card */}
           <div className="flex flex-col rounded-2xl bg-white p-8 shadow-sm sm:p-10">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-blue-600">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-primary">
               Мэргэжлийн зөвлөгөө
             </p>
             <h2 className="mt-3 text-[28px] font-bold leading-tight text-foreground sm:text-[32px]">
@@ -268,7 +268,7 @@ export default function HomePage() {
                   transition={{ duration: 0.3, delay: i * 0.08 }}
                   className="flex items-center gap-4"
                 >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                     <item.icon className="h-5 w-5" />
                   </div>
                   <p className="text-[16px] font-medium text-foreground">{item.text}</p>
@@ -307,14 +307,14 @@ export default function HomePage() {
 
               <Button
                 type="submit"
-                className="mt-2 h-14 w-full gap-2 rounded-lg bg-blue-600 text-[14px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-blue-700"
+                className="mt-2 h-14 w-full gap-2 rounded-lg bg-primary text-[14px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-primary/90"
               >
                 {t("home.subscribe")}
                 <Send className="h-4 w-4" />
               </Button>
 
               <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
-                <Check className="h-4 w-4 text-blue-600" />
+                <Check className="h-4 w-4 text-primary" />
                 <span>Мэдээлэл нь нууцлагдана</span>
               </div>
             </form>

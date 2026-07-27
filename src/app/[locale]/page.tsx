@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "@/components/common/Image";
+import { Truck, ShieldCheck, Headphones, Lock } from "lucide-react";
 import type { Product } from "@/graphql/ecommerce/queries/product";
 
 const FEATURED_PRODUCTS: Product[] = [
@@ -49,12 +50,12 @@ export default function HomePage() {
         variants={sectionVariants}
         className="mx-auto w-full max-w-[1440px] px-10 py-16"
       >
-        <div className="grid grid-cols-2 gap-8 border-y border-border py-10 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { title: t("home.freeDelivery"), desc: "Хүргэлтийн үйлчилгээ" },
-            { title: t("home.quality"), desc: "Баталгаат чанар" },
-            { title: t("home.support"), desc: "24/7 тусламж" },
-            { title: t("home.securePayment"), desc: "Аюулгүй төлбөр" },
+            { title: t("home.freeDelivery"), desc: "Хүргэлтийн үйлчилгээ", icon: Truck },
+            { title: t("home.quality"), desc: "Баталгаат чанар", icon: ShieldCheck },
+            { title: t("home.support"), desc: "24/7 тусламж", icon: Headphones },
+            { title: t("home.securePayment"), desc: "Аюулгүй төлбөр", icon: Lock },
           ].map((badge, i) => (
             <motion.div
               key={badge.title}
@@ -62,10 +63,13 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.3, delay: i * 0.05 }}
-              className="text-center"
+              className="group flex flex-col items-center gap-4 bg-background py-12 text-center transition-colors hover:bg-muted"
             >
-              <p className="text-[14px] font-medium">{badge.title}</p>
-              <p className="mt-1 text-[12px] text-muted-foreground">{badge.desc}</p>
+              <badge.icon className="h-7 w-7 text-muted-foreground transition-colors group-hover:text-foreground" />
+              <div>
+                <p className="text-[15px] font-semibold">{badge.title}</p>
+                <p className="mt-1 text-[13px] text-muted-foreground">{badge.desc}</p>
+              </div>
             </motion.div>
           ))}
         </div>

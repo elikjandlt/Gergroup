@@ -103,19 +103,19 @@ export default function HomePage() {
             >
               <Link
                 href={`/products?category=${encodeURIComponent(cat.slug)}`}
-                className="group relative flex aspect-square flex-col justify-end overflow-hidden bg-muted"
+                className="group flex flex-col"
               >
-                <Image
-                  src={cat.image}
-                  alt={cat.name}
-                  fill
-                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                <div className="absolute inset-0 bg-foreground/0 transition-colors duration-300 group-hover:bg-foreground/10" />
-                <div className="relative p-4 text-white">
-                  <p className="text-[14px] font-semibold leading-tight">{cat.name}</p>
-                  <p className="mt-2 inline-flex items-center text-[11px] font-medium opacity-70 transition-opacity duration-300 group-hover:opacity-100">
+                <div className="relative aspect-square overflow-hidden bg-muted">
+                  <Image
+                    src={cat.image}
+                    alt={cat.name}
+                    fill
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
+                  />
+                </div>
+                <div className="mt-3">
+                  <p className="text-[14px] font-semibold text-foreground">{cat.name}</p>
+                  <p className="mt-1 inline-flex items-center text-[12px] font-medium text-muted-foreground transition-colors group-hover:text-foreground">
                     Харах <span className="ml-1">→</span>
                   </p>
                 </div>

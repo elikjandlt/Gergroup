@@ -114,9 +114,8 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="absolute inset-0 bg-foreground/0 transition-colors duration-300 group-hover:bg-foreground/10" />
                 <div className="relative p-4 text-white">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] opacity-80">{i + 1 < 10 ? `0${i + 1}` : i + 1}</p>
-                  <p className="mt-1 text-[14px] font-semibold leading-tight">{cat.name}</p>
-                  <p className="mt-2 inline-flex items-center text-[11px] font-medium opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <p className="text-[14px] font-semibold leading-tight">{cat.name}</p>
+                  <p className="mt-2 inline-flex items-center text-[11px] font-medium opacity-70 transition-opacity duration-300 group-hover:opacity-100">
                     Харах <span className="ml-1">→</span>
                   </p>
                 </div>

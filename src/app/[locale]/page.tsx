@@ -115,9 +115,6 @@ export default function HomePage() {
                 </div>
                 <div className="mt-3">
                   <p className="text-[14px] font-semibold text-foreground">{cat.name}</p>
-                  <p className="mt-1 inline-flex items-center text-[12px] font-medium text-muted-foreground transition-colors group-hover:text-foreground">
-                    Харах <span className="ml-1">→</span>
-                  </p>
                 </div>
               </Link>
             </motion.div>

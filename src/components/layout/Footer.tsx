@@ -64,38 +64,38 @@ export async function Footer() {
 
   return (
     <footer className="w-full bg-primary text-white">
-      <div className="mx-auto max-w-[1440px] px-6 py-16 sm:px-10 lg:py-24">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-10">
+      <div className="mx-auto max-w-[1440px] px-6 py-10 sm:px-10 lg:py-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-6">
           {/* Brand & contact */}
-          <div className="flex flex-col gap-8 lg:col-span-5">
-            <div className="flex flex-col gap-4">
-              <Link href="/" className="text-[22px] font-semibold uppercase tracking-[4px] text-white">
+          <div className="flex flex-col gap-5 lg:col-span-5">
+            <div className="flex flex-col gap-2">
+              <Link href="/" className="text-[18px] font-semibold uppercase tracking-[4px] text-white">
                 Гэр Групп ХХК
               </Link>
-              <p className="max-w-sm text-[15px] leading-relaxed text-white/60">
+              <p className="max-w-sm text-[13px] leading-relaxed text-white/60">
                 {t("footer.tagline")}
               </p>
             </div>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               {contactItems.map((item) => (
-                <div key={item.label} className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
-                    <item.icon className="h-5 w-5" />
+                <div key={item.label} className="flex items-start gap-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
+                    <item.icon className="h-4 w-4" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[11px] font-semibold uppercase tracking-wider text-white/50">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
                       {item.label}
                     </span>
                     {item.href ? (
                       <a
                         href={item.href}
-                        className="mt-1 text-[15px] font-medium text-white transition-colors hover:text-white/80"
+                        className="mt-0.5 text-[14px] font-medium text-white transition-colors hover:text-white/80"
                       >
                         {item.value}
                       </a>
                     ) : (
-                      <span className="mt-1 text-[15px] font-medium text-white">{item.value}</span>
+                      <span className="mt-0.5 text-[14px] font-medium text-white">{item.value}</span>
                     )}
                   </div>
                 </div>
@@ -104,85 +104,85 @@ export async function Footer() {
           </div>
 
           {/* Shop links */}
-          <div className="flex flex-col gap-6 lg:col-span-2">
-            <span className="text-[12px] font-semibold uppercase tracking-[0.2em] text-white/50">
+          <div className="flex flex-col gap-4 lg:col-span-2">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50">
               {t("footer.shop")}
             </span>
-            <div className="flex flex-col gap-4">
-              <Link href="/products" className="text-[15px] text-white/80 transition-colors hover:text-white">
+            <div className="flex flex-col gap-2">
+              <Link href="/products" className="text-[13px] text-white/80 transition-colors hover:text-white">
                 {t("nav.products")}
               </Link>
-              <Link href="/cart" className="text-[15px] text-white/80 transition-colors hover:text-white">
+              <Link href="/cart" className="text-[13px] text-white/80 transition-colors hover:text-white">
                 {t("nav.cart")}
               </Link>
-              <Link href="/wishlist" className="text-[15px] text-white/80 transition-colors hover:text-white">
+              <Link href="/wishlist" className="text-[13px] text-white/80 transition-colors hover:text-white">
                 {t("nav.wishlist")}
               </Link>
-              <Link href="/orders" className="text-[15px] text-white/80 transition-colors hover:text-white">
+              <Link href="/orders" className="text-[13px] text-white/80 transition-colors hover:text-white">
                 {t("orders.title")}
               </Link>
             </div>
           </div>
 
           {/* Help links */}
-          <div className="flex flex-col gap-6 lg:col-span-2">
-            <span className="text-[12px] font-semibold uppercase tracking-[0.2em] text-white/50">
+          <div className="flex flex-col gap-4 lg:col-span-2">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50">
               {t("footer.help")}
             </span>
-            <div className="flex flex-col gap-4">
-              <Link href="/contact" className="text-[15px] text-white/80 transition-colors hover:text-white">
+            <div className="flex flex-col gap-2">
+              <Link href="/contact" className="text-[13px] text-white/80 transition-colors hover:text-white">
                 {t("home.contact")}
               </Link>
-              <Link href="/news" className="text-[15px] text-white/80 transition-colors hover:text-white">
+              <Link href="/news" className="text-[13px] text-white/80 transition-colors hover:text-white">
                 {t("nav.news")}
               </Link>
-              <Link href="/profile" className="text-[15px] text-white/80 transition-colors hover:text-white">
+              <Link href="/profile" className="text-[13px] text-white/80 transition-colors hover:text-white">
                 {t("nav.profile")}
               </Link>
             </div>
           </div>
 
           {/* Social */}
-          <div className="flex flex-col gap-6 lg:col-span-3">
-            <span className="text-[12px] font-semibold uppercase tracking-[0.2em] text-white/50">
+          <div className="flex flex-col gap-4 lg:col-span-3">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50">
               {t("footer.social")}
             </span>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               <a
                 href="https://www.facebook.com/GerGroupLTD"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-primary"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-primary"
               >
-                <FacebookIcon className="h-5 w-5" />
+                <FacebookIcon className="h-4 w-4" />
               </a>
               <a
                 href="https://www.instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-primary"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-primary"
               >
-                <InstagramIcon className="h-5 w-5" />
+                <InstagramIcon className="h-4 w-4" />
               </a>
               <a
                 href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="YouTube"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-primary"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-primary"
               >
-                <YoutubeIcon className="h-5 w-5" />
+                <YoutubeIcon className="h-4 w-4" />
               </a>
               <a
                 href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-primary"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white hover:text-primary"
               >
-                <LinkedinIcon className="h-5 w-5" />
+                <LinkedinIcon className="h-4 w-4" />
               </a>
             </div>
           </div>
@@ -190,8 +190,8 @@ export async function Footer() {
       </div>
 
       <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-4 px-6 py-8 sm:px-10 lg:flex-row">
-          <p className="text-[13px] text-white/50">
+        <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-2 px-6 py-4 sm:px-10 lg:flex-row">
+          <p className="text-[12px] text-white/50">
             © {new Date().getFullYear()} Гэр Групп ХХК. {t("footer.rights")}
           </p>
         </div>

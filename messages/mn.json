@@ -37,11 +37,18 @@
   "products": {
     "title": "Бүтээгдэхүүн",
     "search": "Хайх",
+    "searchPlaceholder": "Бүтээгдэхүүний нэрээр хайх...",
     "categories": "Ангилал",
     "all": "Бүгд",
     "count": "бүтээгдэхүүн",
+    "sortBy": "Эрэмбэлэх",
+    "sortFeatured": "Онцлох",
+    "sortPriceAsc": "Үнэ: бага → их",
+    "sortPriceDesc": "Үнэ: их → бага",
+    "sortName": "Нэр",
     "notFound": "Бүтээгдэхүүн олдсонгүй",
-    "back": "Буцах"
+    "back": "Буцах",
+    "clearFilters": "Шүүлтүүр цэвэрлэх"
   },
   "product": {
     "addToCart": "Сагсанд нэмэх",

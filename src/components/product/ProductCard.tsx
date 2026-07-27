@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { useAtom } from "jotai";
 import { Link } from "@/i18n/routing";
@@ -12,7 +11,6 @@ import type { Product } from "@/graphql/ecommerce/queries/product";
 
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
   const [cartItems, setCartItems] = useAtom(cartItemsAtom);
-  const [isHovered, setIsHovered] = useState(false);
 
   const addToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -46,36 +44,27 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.35, ease: "easeOut", delay: index * 0.05 }}
+      className="group flex flex-col border border-border bg-background transition-colors hover:border-foreground"
     >
-      <Link
-        href={`/products/${product._id}`}
-        className="group flex flex-col gap-3"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <div className="relative aspect-[3/4] overflow-hidden bg-muted">
-          <Image
-            src={product.attachment?.url}
-            alt={product.name || ""}
-            fill
-            className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
-          />
-          <motion.div
-            initial={false}
-            animate={{ y: isHovered ? 0 : "100%" }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
-            className="absolute bottom-0 left-0 right-0 flex justify-center p-3"
-          >
-            <Button onClick={addToCart} size="sm" className="w-full">
-              Сагсанд нэмэх
-            </Button>
-          </motion.div>
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="text-[13px]">{product.name}</p>
-          <p className="text-[13px] text-muted-foreground">{formatPrice(product.unitPrice)}</p>
-        </div>
+      <Link href={`/products/${product._id}`} className="relative block aspect-[3/4] overflow-hidden bg-muted">
+        <Image
+          src={product.attachment?.url}
+          alt={product.name || ""}
+          fill
+          className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.04]"
+        />
       </Link>
+      <div className="flex flex-1 flex-col gap-3 border-t border-border p-4">
+        <Link href={`/products/${product._id}`} className="flex-1">
+          <h3 className="text-[14px] font-medium leading-snug transition-colors group-hover:text-muted-foreground">
+            {product.name}
+          </h3>
+          <p className="mt-2 text-[14px] font-semibold">{formatPrice(product.unitPrice)}</p>
+        </Link>
+        <Button onClick={addToCart} variant="outline" size="sm" className="w-full">
+          Сагсанд нэмэх
+        </Button>
+      </div>
     </motion.div>
   );
 }

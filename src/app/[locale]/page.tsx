@@ -92,18 +92,18 @@ export default function HomePage() {
             {t("home.viewAll")}
           </Link>
         </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {CATEGORIES.map((cat, i) => (
             <motion.div
               key={cat.slug}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.35, delay: i * 0.08, ease: "easeOut" }}
+              transition={{ duration: 0.35, delay: i * 0.05, ease: "easeOut" }}
             >
               <Link
                 href={`/products?category=${encodeURIComponent(cat.slug)}`}
-                className="group relative flex aspect-[4/3] flex-col justify-end overflow-hidden bg-muted"
+                className="group relative flex aspect-square flex-col justify-end overflow-hidden bg-muted"
               >
                 <Image
                   src={cat.image}
@@ -113,11 +113,11 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="absolute inset-0 bg-foreground/0 transition-colors duration-300 group-hover:bg-foreground/10" />
-                <div className="relative p-6 text-white">
+                <div className="relative p-4 text-white">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] opacity-80">{i + 1 < 10 ? `0${i + 1}` : i + 1}</p>
-                  <p className="mt-1 text-[20px] font-semibold">{cat.name}</p>
-                  <p className="mt-2 inline-flex items-center text-[13px] font-medium opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    Бүтээгдэхүүн харах <span className="ml-2">→</span>
+                  <p className="mt-1 text-[14px] font-semibold leading-tight">{cat.name}</p>
+                  <p className="mt-2 inline-flex items-center text-[11px] font-medium opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    Харах <span className="ml-1">→</span>
                   </p>
                 </div>
               </Link>

@@ -2,9 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Input } from "@/components/ui/input";
 import { PageLoader } from "@/components/common/Loader";
+import Image from "@/components/common/Image";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
 import type { Product } from "@/graphql/ecommerce/queries/product";
@@ -101,8 +103,39 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-10 py-16">
-      {/* Page header */}
+    <div className="flex flex-col">
+      {/* Hero */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative h-[320px] w-full overflow-hidden sm:h-[380px]"
+      >
+        <Image
+          src="/images/products/foam.jpg"
+          alt={t("products.title")}
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 flex items-center">
+          <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-white/70">
+              Бүтээгдэхүүний каталог
+            </p>
+            <h1 className="mt-2 text-[32px] font-bold text-white sm:text-[42px]">
+              {t("products.title")}
+            </h1>
+            <p className="mt-3 max-w-xl text-[15px] text-white/70">
+              Манай хуванцар цонхны үндсэн болон туслах материалын бүх бүтээгдэхүүнийг эндээс үзнэ үү.
+            </p>
+          </div>
+        </div>
+      </motion.section>
+
+      <div className="mx-auto w-full max-w-[1440px] px-6 py-16 sm:px-10">
+        {/* Page header */}
       <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <h1 className="text-[32px] font-bold">
           {selectedCategory} <span className="text-muted-foreground">({filtered.length})</span>
@@ -255,5 +288,6 @@ export default function ProductsPage() {
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }

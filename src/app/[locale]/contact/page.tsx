@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import Image from "@/components/common/Image";
 import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
 
 const FacebookIcon = ({ className }: { className?: string }) => (
@@ -83,150 +84,182 @@ export default function ContactPage() {
   };
 
   return (
-    <section className="w-full bg-slate-50 py-24">
-      <div className="mx-auto max-w-[1440px] px-6 sm:px-10">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.45, ease: "easeOut" }}
-          className="grid grid-cols-1 gap-8 lg:grid-cols-2"
-        >
-          {/* Contact info card */}
-          <div className="flex flex-col rounded-2xl bg-white p-8 shadow-sm sm:p-10">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-primary">
-              Холбоо барих мэдээлэл
+    <div className="flex flex-col">
+      {/* Hero */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative h-[320px] w-full overflow-hidden sm:h-[380px]"
+      >
+        <Image
+          src="/images/products/block-foam.jpg"
+          alt={t("home.contact")}
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 flex items-center">
+          <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-white/70">
+              Холбоо барих
             </p>
-            <h1 className="mt-3 text-[28px] font-bold leading-tight text-foreground sm:text-[32px]">
+            <h1 className="mt-2 text-[32px] font-bold text-white sm:text-[42px]">
               {t("home.contact")}
             </h1>
-            <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-              Танд асуух зүйл байна уу? Бидэнтэй холбогдоорой.
+            <p className="mt-3 max-w-xl text-[15px] text-white/70">
+              Танд асуух зүйл байна уу? Бидэнтэй холбогдоорой. Бид таны асуултанд 24 цагийн дотор хариу өгөх болно.
             </p>
+          </div>
+        </div>
+      </motion.section>
 
-            <div className="mt-8 flex flex-col gap-6">
-              {contactInfo.map((item, i) => (
-                <motion.div
-                  key={item.label}
-                  initial={{ opacity: 0, x: -12 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.3, delay: i * 0.08 }}
-                  className="flex items-start gap-4"
-                >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <item.icon className="h-5 w-5" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      {item.label}
-                    </span>
-                    {item.href ? (
-                      <a
-                        href={item.href}
-                        className="mt-1 text-[16px] font-medium text-foreground transition-colors hover:text-primary"
-                      >
-                        {item.value}
-                      </a>
-                    ) : (
-                      <span className="mt-1 text-[16px] font-medium text-foreground">{item.value}</span>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+      <section className="w-full bg-slate-50 py-24">
+        <div className="mx-auto max-w-[1440px] px-6 sm:px-10">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+            className="grid grid-cols-1 gap-8 lg:grid-cols-2"
+          >
+            {/* Contact info card */}
+            <div className="flex flex-col rounded-2xl bg-white p-8 shadow-sm sm:p-10">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-primary">
+                Холбоо барих мэдээлэл
+              </p>
+              <h2 className="mt-3 text-[28px] font-bold leading-tight text-foreground sm:text-[32px]">
+                Бидэнтэй холбогдоорой
+              </h2>
+              <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
+                Танд асуух зүйл байна уу? Бидэнтэй холбогдоорой.
+              </p>
 
-            <div className="mt-auto pt-10">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Сошиал</p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                {socialLinks.map((social, i) => (
-                  <a
-                    key={i}
-                    href={social.href}
-                    aria-label={social.label}
-                    className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-primary transition-all duration-200 hover:bg-primary hover:text-white"
+              <div className="mt-8 flex flex-col gap-6">
+                {contactInfo.map((item, i) => (
+                  <motion.div
+                    key={item.label}
+                    initial={{ opacity: 0, x: -12 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.3, delay: i * 0.08 }}
+                    className="flex items-start gap-4"
                   >
-                    <social.icon className="h-5 w-5" />
-                  </a>
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <item.icon className="h-5 w-5" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        {item.label}
+                      </span>
+                      {item.href ? (
+                        <a
+                          href={item.href}
+                          className="mt-1 text-[16px] font-medium text-foreground transition-colors hover:text-primary"
+                        >
+                          {item.value}
+                        </a>
+                      ) : (
+                        <span className="mt-1 text-[16px] font-medium text-foreground">{item.value}</span>
+                      )}
+                    </div>
+                  </motion.div>
                 ))}
               </div>
+
+              <div className="mt-auto pt-10">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Сошиал</p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {socialLinks.map((social, i) => (
+                    <a
+                      key={i}
+                      href={social.href}
+                      aria-label={social.label}
+                      className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-primary transition-all duration-200 hover:bg-primary hover:text-white"
+                    >
+                      <social.icon className="h-5 w-5" />
+                    </a>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* Contact form card */}
-          <div className="rounded-2xl bg-white p-8 shadow-sm sm:p-10">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {/* Contact form card */}
+            <div className="rounded-2xl bg-white p-8 shadow-sm sm:p-10">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[12px] font-medium text-foreground">{t("contact.name")}</label>
+                    <Input
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="Таны нэр"
+                      className="h-12 rounded-lg border-border bg-slate-50 px-4 text-[14px]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[12px] font-medium text-foreground">{t("contact.email")}</label>
+                    <Input
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="Имэйл хаяг"
+                      className="h-12 rounded-lg border-border bg-slate-50 px-4 text-[14px]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[12px] font-medium text-foreground">{t("contact.phone")}</label>
+                    <Input
+                      name="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="Утасны дугаар"
+                      className="h-12 rounded-lg border-border bg-slate-50 px-4 text-[14px]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[12px] font-medium text-foreground">Гарчиг</label>
+                    <Input
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      placeholder="Гарчиг"
+                      className="h-12 rounded-lg border-border bg-slate-50 px-4 text-[14px]"
+                    />
+                  </div>
+                </div>
+
                 <div className="flex flex-col gap-2">
-                  <label className="text-[12px] font-medium text-foreground">{t("contact.name")}</label>
-                  <Input
-                    name="name"
-                    value={formData.name}
+                  <label className="text-[12px] font-medium text-foreground">{t("contact.message")}</label>
+                  <Textarea
+                    name="message"
+                    value={formData.message}
                     onChange={handleChange}
-                    placeholder="Таны нэр"
-                    className="h-12 rounded-lg border-border bg-slate-50 px-4 text-[14px]"
+                    placeholder="Зурвасаа бичнэ үү"
+                    rows={6}
+                    className="rounded-lg border-border bg-slate-50 px-4 py-3 text-[14px]"
                   />
                 </div>
-                <div className="flex flex-col gap-2">
-                  <label className="text-[12px] font-medium text-foreground">{t("contact.email")}</label>
-                  <Input
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Имэйл хаяг"
-                    className="h-12 rounded-lg border-border bg-slate-50 px-4 text-[14px]"
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div className="flex flex-col gap-2">
-                  <label className="text-[12px] font-medium text-foreground">{t("contact.phone")}</label>
-                  <Input
-                    name="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="Утасны дугаар"
-                    className="h-12 rounded-lg border-border bg-slate-50 px-4 text-[14px]"
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label className="text-[12px] font-medium text-foreground">Гарчиг</label>
-                  <Input
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    placeholder="Гарчиг"
-                    className="h-12 rounded-lg border-border bg-slate-50 px-4 text-[14px]"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-[12px] font-medium text-foreground">{t("contact.message")}</label>
-                <Textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder="Зурвасаа бичнэ үү"
-                  rows={6}
-                  className="rounded-lg border-border bg-slate-50 px-4 py-3 text-[14px]"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="mt-2 h-14 w-full gap-2 rounded-lg bg-primary text-[14px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-primary/90"
-              >
-                {t("contact.submit")}
-                <Send className="h-4 w-4" />
-              </Button>
-            </form>
-          </div>
-        </motion.div>
-      </div>
-    </section>
+                <Button
+                  type="submit"
+                  className="mt-2 h-14 w-full gap-2 rounded-lg bg-primary text-[14px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-primary/90"
+                >
+                  {t("contact.submit")}
+                  <Send className="h-4 w-4" />
+                </Button>
+              </form>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </div>
   );
 }

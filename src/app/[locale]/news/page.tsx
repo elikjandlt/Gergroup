@@ -76,38 +76,42 @@ export default function NewsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 pb-24">
-      {/* Header */}
-      <section className="bg-background border-b border-border">
-        <div className="mx-auto w-full max-w-[1440px] px-6 py-12 sm:px-10 sm:py-16">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={sectionVariants}
-          >
+      {/* Hero */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative h-[320px] w-full overflow-hidden sm:h-[380px]"
+      >
+        <Image
+          src="/images/products/mako2.jpg"
+          alt={t("news.title")}
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 flex items-center">
+          <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10">
             <Link
               href="/"
-              className="mb-6 inline-flex items-center gap-2 text-[13px] font-medium text-muted-foreground transition-colors hover:text-primary"
+              className="mb-4 inline-flex items-center gap-2 text-[13px] font-medium text-white/70 transition-colors hover:text-white"
             >
               <ArrowLeft className="h-4 w-4" />
               {t("news.back")}
             </Link>
-
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-primary">
-                  Компанийн мэдээ
-                </p>
-                <h1 className="mt-2 text-[32px] font-bold leading-tight tracking-tight sm:text-[42px]">
-                  {t("news.title")}
-                </h1>
-              </div>
-              <p className="max-w-md text-[15px] leading-relaxed text-muted-foreground">
-                Манай компанийн шинэ бүтээгдэхүүн, үйлчилгээ, болон салбарын мэдээллүүдийг эндээс хүлээн авна уу.
-              </p>
-            </div>
-          </motion.div>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-white/70">
+              Компанийн мэдээ
+            </p>
+            <h1 className="mt-2 text-[32px] font-bold text-white sm:text-[42px]">
+              {t("news.title")}
+            </h1>
+            <p className="mt-3 max-w-xl text-[15px] text-white/70">
+              Манай компанийн шинэ бүтээгдэхүүн, үйлчилгээ, болон салбарын мэдээллүүдийг эндээс хүлээн авна уу.
+            </p>
+          </div>
         </div>
-      </section>
+      </motion.section>
 
       <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10">
         {/* Featured article */}

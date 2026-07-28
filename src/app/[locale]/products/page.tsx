@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { useQuery } from "@apollo/client/react";
 import { ProductCard } from "@/components/product/ProductCard";
@@ -13,8 +14,9 @@ import { ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
 import type { Product } from "@/graphql/ecommerce/queries/product";
 import { CP_PAGES, type CpPagesData } from "@/graphql/cms/queries/page";
 import { CP_POSTS, type CpPostsData, type Post } from "@/graphql/cms/queries/post";
+import { CP_CATEGORIES, type CpCategoriesData } from "@/graphql/cms/queries/category";
 
-const CATEGORIES = ["Хөөс", "Түгжээ", "Хуванцар тавцан", "Хуванцар амалгаа", "Ус уур чийг тусгаарлагч", "Резин"];
+const FALLBACK_CATEGORIES = ["Хөөс", "Түгжээ", "Хуванцар тавцан", "Хуванцар амалгаа", "Ус уур чийг тусгаарлагч", "Резин"];
 
 type SortOption = "featured" | "price-asc" | "price-desc" | "name";
 
@@ -43,6 +45,9 @@ export function postToProduct(post: Post): Product {
 }
 
 export function getPostCategory(post: Post): string {
+  if (post.categories && post.categories.length > 0) {
+    return post.categories[0]?.name ?? "";
+  }
   const category = getCustomField(post, "category");
   return typeof category === "string" ? category : "";
 }
@@ -51,7 +56,8 @@ export default function ProductsPage() {
   const t = useTranslations();
   const locale = useLocale();
   const [searchValue, setSearchValue] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("Хөөс");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const searchParams = useSearchParams();
   const [sortBy, setSortBy] = useState<SortOption>("featured");
   const [page, setPage] = useState(1);
   const [showFilters, setShowFilters] = useState(true);
@@ -66,6 +72,11 @@ export default function ProductsPage() {
     fetchPolicy: "cache-first",
   });
 
+  const { data: categoriesData } = useQuery<CpCategoriesData>(CP_CATEGORIES, {
+    variables: { language: locale },
+    fetchPolicy: "cache-first",
+  });
+
   const productsPage = pagesData?.cpPages?.find((p) => p.slug === "products");
 
   const cmsProducts = useMemo(() => {
@@ -73,10 +84,18 @@ export default function ProductsPage() {
     return posts;
   }, [postsData]);
 
+  const categoryNames = useMemo(() => {
+    const list = categoriesData?.cpCategories?.list ?? [];
+    const names = list.map((cat) => cat.name ?? "").filter(Boolean);
+    return names.length > 0 ? names : FALLBACK_CATEGORIES;
+  }, [categoriesData]);
+
+  const effectiveCategory = selectedCategory || searchParams.get("category") || categoryNames[0] || "";
+
   const filtered = useMemo(() => {
     let result = cmsProducts.filter((p) => {
       const matchesSearch = !searchValue || p.title?.toLowerCase().includes(searchValue.toLowerCase());
-      const matchesCategory = getPostCategory(p) === selectedCategory;
+      const matchesCategory = getPostCategory(p) === effectiveCategory;
       return matchesSearch && matchesCategory;
     });
 
@@ -92,7 +111,7 @@ export default function ProductsPage() {
       result = [...result].sort((a, b) => (a.title || "").localeCompare(b.title || "", "mn"));
 
     return result;
-  }, [searchValue, selectedCategory, sortBy, cmsProducts]);
+  }, [searchValue, effectiveCategory, sortBy, cmsProducts]);
 
   const perPage = 9;
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
@@ -107,7 +126,7 @@ export default function ProductsPage() {
 
   const clearFilters = () => {
     setSearchValue("");
-    setSelectedCategory("Хөөс");
+    setSelectedCategory("");
     setSortBy("featured");
     setPage(1);
   };
@@ -148,7 +167,7 @@ export default function ProductsPage() {
         {/* Page header */}
         <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <h1 className="text-[32px] font-bold">
-            {selectedCategory} <span className="text-muted-foreground">({filtered.length})</span>
+            {effectiveCategory} <span className="text-muted-foreground">({filtered.length})</span>
           </h1>
 
           <div className="flex items-center gap-6">
@@ -209,7 +228,7 @@ export default function ProductsPage() {
 
               <nav>
                 <ul className="flex flex-col gap-3">
-                  {CATEGORIES.map((cat) => (
+                  {categoryNames.map((cat) => (
                     <li key={cat}>
                       <button
                         onClick={() => {
@@ -218,7 +237,7 @@ export default function ProductsPage() {
                         }}
                         className={cn(
                           "text-left text-[16px] transition-colors",
-                          selectedCategory === cat
+                          effectiveCategory === cat
                             ? "font-bold text-foreground"
                             : "font-medium text-muted-foreground hover:text-foreground"
                         )}

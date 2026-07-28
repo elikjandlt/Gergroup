@@ -1,7 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { motion } from "framer-motion";
+import { useQuery } from "@apollo/client/react";
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import Image from "@/components/common/Image";
 import { Truck, ShieldCheck, Headphones, Lock, ArrowRight, ShoppingBag, Check, Clock, Mail, Phone, Send } from "lucide-react";
 import type { Product } from "@/graphql/ecommerce/queries/product";
+import { CP_PAGES, type CpPagesData } from "@/graphql/cms/queries/page";
 import { cartItemsAtom } from "@/store/cart.store";
 import { useAtom } from "jotai";
 import { formatPrice } from "@/lib/utils";
@@ -114,12 +116,58 @@ function FeaturedProductCard({ product, index }: { product: Product; index: numb
 
 export default function HomePage() {
   const t = useTranslations();
+  const locale = useLocale();
+
+  const { data: pagesData } = useQuery<CpPagesData>(CP_PAGES, {
+    variables: { language: locale },
+    fetchPolicy: "cache-first",
+  });
+
+  const homePage = pagesData?.cpPages?.find((page) => page.slug === "home");
 
   return (
     <div className="flex flex-col">
       {/* Hero */}
       <section className="relative h-[70vh] min-h-[560px] w-full overflow-hidden">
         <Image src="/images/hero.jpg" alt="Гэр Групп ХХК" fill className="object-cover" priority />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+        <div className="absolute inset-0 flex items-end">
+          <div className="mx-auto w-full max-w-[1440px] px-6 pb-16 sm:px-10 sm:pb-20">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-white/70">
+                Гэр Групп ХХК
+              </p>
+              <h1 className="mt-3 max-w-3xl text-[32px] font-bold leading-tight text-white sm:text-[48px]">
+                {homePage?.description ?? t("hero.label")}
+              </h1>
+              {homePage?.content && (
+                <div
+                  className="mt-4 max-w-2xl text-[15px] leading-relaxed text-white/70 [&_p]:mb-2"
+                  dangerouslySetInnerHTML={{ __html: homePage.content }}
+                />
+              )}
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Link
+                  href="/products"
+                  className="inline-flex h-14 items-center gap-2 rounded-lg bg-primary px-8 text-[14px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-primary/90"
+                >
+                  {t("hero.cta")}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href="/about"
+                  className="inline-flex h-14 items-center gap-2 rounded-lg border border-white/30 px-8 text-[14px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-white/10"
+                >
+                  Бидний тухай
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </div>
       </section>
 
       {/* Trust badges */}

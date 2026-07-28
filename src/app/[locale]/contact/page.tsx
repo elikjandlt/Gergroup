@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { motion } from "framer-motion";
+import { useQuery } from "@apollo/client/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "@/components/common/Image";
+import { CP_PAGES, type CpPagesData } from "@/graphql/cms/queries/page";
 import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
 
 const FacebookIcon = ({ className }: { className?: string }) => (
@@ -67,6 +69,7 @@ const socialLinks = [
 
 export default function ContactPage() {
   const t = useTranslations();
+  const locale = useLocale();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -74,6 +77,13 @@ export default function ContactPage() {
     subject: "",
     message: "",
   });
+
+  const { data: pagesData } = useQuery<CpPagesData>(CP_PAGES, {
+    variables: { language: locale },
+    fetchPolicy: "cache-first",
+  });
+
+  const contactPage = pagesData?.cpPages?.find((page) => page.slug === "contact");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,10 +116,10 @@ export default function ContactPage() {
               Холбоо барих
             </p>
             <h1 className="mt-2 text-[32px] font-bold text-white sm:text-[42px]">
-              {t("home.contact")}
+              {contactPage?.name ?? t("home.contact")}
             </h1>
             <p className="mt-3 max-w-xl text-[15px] text-white/70">
-              Танд асуух зүйл байна уу? Бидэнтэй холбогдоорой. Бид таны асуултанд 24 цагийн дотор хариу өгөх болно.
+              {contactPage?.description ?? "Танд асуух зүйл байна уу? Бидэнтэй холбогдоорой. Бид таны асуултанд 24 цагийн дотор хариу өгөх болно."}
             </p>
           </div>
         </div>
@@ -132,9 +142,16 @@ export default function ContactPage() {
               <h2 className="mt-3 text-[28px] font-bold leading-tight text-foreground sm:text-[32px]">
                 Бидэнтэй холбогдоорой
               </h2>
-              <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                Танд асуух зүйл байна уу? Бидэнтэй холбогдоорой.
-              </p>
+              {contactPage?.content ? (
+                <div
+                  className="mt-4 text-[15px] leading-relaxed text-muted-foreground [&_p]:mb-3"
+                  dangerouslySetInnerHTML={{ __html: contactPage.content }}
+                />
+              ) : (
+                <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
+                  Танд асуух зүйл байна уу? Бидэнтэй холбогдоорой.
+                </p>
+              )}
 
               <div className="mt-8 flex flex-col gap-6">
                 {contactInfo.map((item, i) => (

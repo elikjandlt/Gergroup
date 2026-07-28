@@ -1,5 +1,10 @@
-import { getTranslations } from "next-intl/server";
+"use client";
+
+import { useMemo } from "react";
+import { useTranslations, useLocale } from "next-intl";
+import { useQuery } from "@apollo/client/react";
 import { Link } from "@/i18n/routing";
+import { CP_MENUS, type CpMenusData, type MenuItem } from "@/graphql/cms/queries/menu";
 
 const PhoneIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -59,8 +64,53 @@ const contactItems = [
   { icon: ClockIcon, label: "Ажлын цаг", value: "Да-Ба 09:00 - 18:00" },
 ];
 
-export async function Footer() {
-  const t = await getTranslations();
+export function Footer() {
+  const t = useTranslations();
+  const locale = useLocale();
+
+  const { data: menuData } = useQuery<CpMenusData>(CP_MENUS, {
+    variables: { language: locale, kind: "footer" },
+    fetchPolicy: "cache-first",
+  });
+
+  const footerColumns = useMemo(() => {
+    const items: MenuItem[] = menuData?.cpMenus ?? [];
+    const parents = items
+      .filter((item) => !item.parentId && !item.parent)
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+    if (parents.length === 0) return [];
+
+    return parents.map((parent) => ({
+      label: parent.label ?? "",
+      children: items
+        .filter((item) => item.parentId === parent._id || item.parent?._id === parent._id)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+        .map((item) => ({ label: item.label ?? "", href: item.url ?? "/" })),
+    }));
+  }, [menuData]);
+
+  const fallbackColumns = [
+    {
+      label: t("footer.shop"),
+      children: [
+        { label: t("nav.products"), href: "/products" },
+        { label: t("nav.cart"), href: "/cart" },
+        { label: t("nav.wishlist"), href: "/wishlist" },
+        { label: t("orders.title"), href: "/orders" },
+      ],
+    },
+    {
+      label: t("footer.help"),
+      children: [
+        { label: t("home.contact"), href: "/contact" },
+        { label: t("nav.news"), href: "/news" },
+        { label: t("nav.profile"), href: "/profile" },
+      ],
+    },
+  ];
+
+  const columns = footerColumns.length > 0 ? footerColumns : fallbackColumns;
 
   return (
     <footer className="w-full bg-primary text-white">
@@ -103,44 +153,25 @@ export async function Footer() {
             </div>
           </div>
 
-          {/* Shop links */}
-          <div className="flex flex-col gap-4 lg:col-span-2">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50">
-              {t("footer.shop")}
-            </span>
-            <div className="flex flex-col gap-2">
-              <Link href="/products" className="text-[13px] text-white/80 transition-colors hover:text-white">
-                {t("nav.products")}
-              </Link>
-              <Link href="/cart" className="text-[13px] text-white/80 transition-colors hover:text-white">
-                {t("nav.cart")}
-              </Link>
-              <Link href="/wishlist" className="text-[13px] text-white/80 transition-colors hover:text-white">
-                {t("nav.wishlist")}
-              </Link>
-              <Link href="/orders" className="text-[13px] text-white/80 transition-colors hover:text-white">
-                {t("orders.title")}
-              </Link>
+          {/* Menu columns from CMS */}
+          {columns.map((column) => (
+            <div key={column.label} className="flex flex-col gap-4 lg:col-span-2">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50">
+                {column.label}
+              </span>
+              <div className="flex flex-col gap-2">
+                {column.children.map((item) => (
+                  <Link
+                    key={item.href + item.label}
+                    href={item.href}
+                    className="text-[13px] text-white/80 transition-colors hover:text-white"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-
-          {/* Help links */}
-          <div className="flex flex-col gap-4 lg:col-span-2">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50">
-              {t("footer.help")}
-            </span>
-            <div className="flex flex-col gap-2">
-              <Link href="/contact" className="text-[13px] text-white/80 transition-colors hover:text-white">
-                {t("home.contact")}
-              </Link>
-              <Link href="/news" className="text-[13px] text-white/80 transition-colors hover:text-white">
-                {t("nav.news")}
-              </Link>
-              <Link href="/profile" className="text-[13px] text-white/80 transition-colors hover:text-white">
-                {t("nav.profile")}
-              </Link>
-            </div>
-          </div>
+          ))}
 
           {/* Social */}
           <div className="flex flex-col gap-4 lg:col-span-3">

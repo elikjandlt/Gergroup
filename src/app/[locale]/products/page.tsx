@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { motion } from "framer-motion";
+import { useQuery } from "@apollo/client/react";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Input } from "@/components/ui/input";
 import { PageLoader } from "@/components/common/Loader";
@@ -10,6 +11,7 @@ import Image from "@/components/common/Image";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
 import type { Product } from "@/graphql/ecommerce/queries/product";
+import { CP_PAGES, type CpPagesData } from "@/graphql/cms/queries/page";
 
 const MOCK_PRODUCTS: Product[] = [
   { _id: "suulgalt-khoos", name: "СУУЛГАЛТЫН ХӨӨС", unitPrice: 29700, attachment: { url: "/images/products/foam.jpg" } },
@@ -57,11 +59,19 @@ function getProductCategory(name?: string | null) {
 
 export default function ProductsPage() {
   const t = useTranslations();
+  const locale = useLocale();
   const [searchValue, setSearchValue] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Хөөс");
   const [sortBy, setSortBy] = useState<SortOption>("featured");
   const [page, setPage] = useState(1);
   const [showFilters, setShowFilters] = useState(true);
+
+  const { data: pagesData } = useQuery<CpPagesData>(CP_PAGES, {
+    variables: { language: locale },
+    fetchPolicy: "cache-first",
+  });
+
+  const productsPage = pagesData?.cpPages?.find((p) => p.slug === "products");
 
   const filtered = useMemo(() => {
     let result = MOCK_PRODUCTS.filter((p) => {
@@ -125,10 +135,10 @@ export default function ProductsPage() {
               Бүтээгдэхүүний каталог
             </p>
             <h1 className="mt-2 text-[32px] font-bold text-white sm:text-[42px]">
-              {t("products.title")}
+              {productsPage?.name ?? t("products.title")}
             </h1>
             <p className="mt-3 max-w-xl text-[15px] text-white/70">
-              Манай хуванцар цонхны үндсэн болон туслах материалын бүх бүтээгдэхүүнийг эндээс үзнэ үү.
+              {productsPage?.description ?? "Манай хуванцар цонхны үндсэн болон туслах материалын бүх бүтээгдэхүүнийг эндээс үзнэ үү."}
             </p>
           </div>
         </div>

@@ -1,30 +1,28 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useMemo } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { motion } from "framer-motion";
+import { useQuery } from "@apollo/client/react";
 import { Link } from "@/i18n/routing";
 import Image from "@/components/common/Image";
 import { ArrowLeft, ArrowRight, Calendar, Clock, ChevronRight } from "lucide-react";
+import { CP_POSTS, type CpPostsData, type Post } from "@/graphql/cms/queries/post";
 
-const NEWS_ITEMS = [
+const FALLBACK_NEWS = [
   {
     _id: "1",
     title: "Хуванцар цонхны материалын шинэ бараа ирлээ",
     excerpt:
       "2024 оны шинэ улирлын бүтээгдэхүүнүүд бэлэн боллоо. Блокны хөөс, түгжээ, тавцан болон ус чийг тусгаарлагч материалуудаас сонголтоо хийнэ үү.",
-    date: "2024.12.15",
-    readTime: "3 мин",
     image: "/images/products/foam.jpg",
     category: "Бүтээгдэхүүн",
-    featured: true,
   },
   {
     _id: "2",
     title: "Өвлийн улиралд цонхоо дулаалах зөвлөмж",
     excerpt:
       "Цонхны хөөс болон резинээр завсрыг битүүмжлэх нь дулааны алдагдлыг 30% хүртэл бууруулдаг. Манай мэргэжилтнүүдийн зөвлөгөөг уншина уу.",
-    date: "2024.12.08",
-    readTime: "5 мин",
     image: "/images/products/mako2.jpg",
     category: "Зөвлөгөө",
   },
@@ -33,8 +31,6 @@ const NEWS_ITEMS = [
     title: "Гэр Групп ХХК шинэ салбар нээлээ",
     excerpt:
       "Харилцагчиддаа ойртох, хүргэлтийн хугацааг богиносгох зорилгоор Улаанбаатар хотод гурав дахь салбараа нээлээ.",
-    date: "2024.11.28",
-    readTime: "4 мин",
     image: "/images/products/tavtsan.jpg",
     category: "Компани",
   },
@@ -43,11 +39,17 @@ const NEWS_ITEMS = [
     title: "Барилгын материалын үнийн өөрчлөлтийн мэдээлэл",
     excerpt:
       "Дэлхийн зах зээл дэх түүхий эдийн үнийн өөрчлөлтөөс хамаарч зарим бүтээгдэхүүний үнэ тохируулагдсан тухай мэдээлэл.",
-    date: "2024.11.15",
-    readTime: "2 мин",
     image: "/images/products/rubber-category.jpg",
     category: "Маркет",
   },
+];
+
+const FALLBACK_IMAGES = [
+  "/images/products/foam.jpg",
+  "/images/products/mako2.jpg",
+  "/images/products/tavtsan.jpg",
+  "/images/products/rubber-category.jpg",
+  "/images/products/block-foam.jpg",
 ];
 
 const sectionVariants = {
@@ -59,9 +61,7 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-    },
+    transition: { staggerChildren: 0.08 },
   },
 };
 
@@ -70,9 +70,51 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
 };
 
+type NewsItem = {
+  _id: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  category: string;
+  date: string;
+};
+
+function formatDate(dateStr?: string) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return "";
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+}
+
 export default function NewsPage() {
   const t = useTranslations();
-  const [featured, ...rest] = NEWS_ITEMS;
+  const locale = useLocale();
+
+  const { data, loading } = useQuery<CpPostsData>(CP_POSTS, {
+    variables: { language: locale, status: "published", limit: 20 },
+    fetchPolicy: "cache-first",
+  });
+
+  const items: NewsItem[] = useMemo(() => {
+    const posts: Post[] = data?.cpPosts ?? [];
+    if (posts.length > 0) {
+      return posts.map((post, i) => ({
+        _id: post._id,
+        title: post.title ?? "",
+        excerpt: post.excerpt ?? "",
+        image: post.thumbnail?.url ?? FALLBACK_IMAGES[i % FALLBACK_IMAGES.length],
+        category: post.categories?.[0]?.name ?? t("news.title"),
+        date: formatDate(post.publishedDate ?? post.createdAt),
+      }));
+    }
+    return FALLBACK_NEWS.map((item, i) => ({
+      ...item,
+      date: ["2024.12.15", "2024.12.08", "2024.11.28", "2024.11.15"][i],
+    }));
+  }, [data, t]);
+
+  const [featured, ...rest] = items;
+  const showContent = !loading && items.length > 0;
 
   return (
     <div className="min-h-screen bg-slate-50 pb-24">
@@ -114,161 +156,161 @@ export default function NewsPage() {
       </motion.section>
 
       <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10">
-        {/* Featured article */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-80px" }}
-          variants={sectionVariants}
-          className="mt-10 lg:mt-14"
-        >
-          <Link
-            href={`/news/${featured._id}`}
-            className="group block overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
-          >
-            <article className="grid grid-cols-1 lg:grid-cols-2">
-              <div className="relative aspect-[16/10] overflow-hidden lg:aspect-auto">
-                <Image
-                  src={featured.image}
-                  alt={featured.title}
-                  fill
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
-                />
-                <div className="absolute left-5 top-5 rounded-full bg-primary px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white">
-                  Онцлох мэдээ
-                </div>
-              </div>
-
-              <div className="flex flex-col justify-center p-8 sm:p-10 lg:p-12">
-                <div className="flex flex-wrap items-center gap-4 text-[13px] text-muted-foreground">
-                  <span className="rounded-full bg-primary/10 px-3 py-1 text-[12px] font-semibold text-primary">
-                    {featured.category}
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="h-3.5 w-3.5" />
-                    {featured.date}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5" />
-                    {featured.readTime} унших
-                  </div>
-                </div>
-
-                <h2 className="mt-5 text-[24px] font-bold leading-tight transition-colors group-hover:text-primary sm:text-[30px]">
-                  {featured.title}
-                </h2>
-
-                <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                  {featured.excerpt}
-                </p>
-
-                <div className="mt-8 inline-flex items-center gap-2 text-[14px] font-semibold text-primary transition-colors">
-                  {t("news.readMore")}
-                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </div>
-              </div>
-            </article>
-          </Link>
-        </motion.div>
-
-        {/* Latest heading */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-80px" }}
-          variants={sectionVariants}
-          className="mb-8 mt-16 flex items-end justify-between lg:mt-20"
-        >
-          <div>
-            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-primary">
-              Сүүлийн нийтлэлүүд
-            </p>
-            <h2 className="mt-2 text-[24px] font-bold">Бусад мэдээ</h2>
+        {loading ? (
+          <div className="mt-14 flex justify-center py-24">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           </div>
-          <span className="text-[14px] text-muted-foreground">
-            {rest.length} мэдээ
-          </span>
-        </motion.div>
+        ) : !showContent ? (
+          <p className="mt-14 py-16 text-center text-[15px] text-muted-foreground">
+            {t("news.empty")}
+          </p>
+        ) : (
+          <>
+            {/* Featured article */}
+            {featured && (
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-80px" }}
+                variants={sectionVariants}
+                className="mt-10 lg:mt-14"
+              >
+                <div className="group block overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow duration-300 hover:shadow-md">
+                  <article className="grid grid-cols-1 lg:grid-cols-2">
+                    <div className="relative aspect-[16/10] overflow-hidden lg:aspect-auto">
+                      <Image
+                        src={featured.image}
+                        alt={featured.title}
+                        fill
+                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                      />
+                      <div className="absolute left-5 top-5 rounded-full bg-primary px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white">
+                        Онцлох мэдээ
+                      </div>
+                    </div>
 
-        {/* News grid */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          variants={containerVariants}
-          className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
-        >
-          {rest.map((item) => (
-            <motion.article
-              key={item._id}
-              variants={itemVariants}
-              className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
-            >
-              <Link href={`/news/${item._id}`} className="relative aspect-[16/10] overflow-hidden">
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  fill
-                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              </Link>
+                    <div className="flex flex-col justify-center p-8 sm:p-10 lg:p-12">
+                      <div className="flex flex-wrap items-center gap-4 text-[13px] text-muted-foreground">
+                        <span className="rounded-full bg-primary/10 px-3 py-1 text-[12px] font-semibold text-primary">
+                          {featured.category}
+                        </span>
+                        {featured.date && (
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="h-3.5 w-3.5" />
+                            {featured.date}
+                          </div>
+                        )}
+                      </div>
 
-              <div className="flex flex-1 flex-col p-6">
-                <div className="flex items-center gap-3 text-[12px] text-muted-foreground">
-                  <span className="font-semibold text-primary">{item.category}</span>
-                  <span className="h-1 w-1 rounded-full bg-muted-foreground" />
-                  <span>{item.date}</span>
+                      <h2 className="mt-5 text-[24px] font-bold leading-tight transition-colors group-hover:text-primary sm:text-[30px]">
+                        {featured.title}
+                      </h2>
+
+                      <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
+                        {featured.excerpt}
+                      </p>
+                    </div>
+                  </article>
                 </div>
+              </motion.div>
+            )}
 
-                <Link href={`/news/${item._id}`}>
-                  <h3 className="mt-3 text-[18px] font-semibold leading-snug transition-colors group-hover:text-primary">
-                    {item.title}
-                  </h3>
-                </Link>
+            {/* Latest heading */}
+            {rest.length > 0 && (
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-80px" }}
+                variants={sectionVariants}
+                className="mb-8 mt-16 flex items-end justify-between lg:mt-20"
+              >
+                <div>
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-primary">
+                    Сүүлийн нийтлэлүүд
+                  </p>
+                  <h2 className="mt-2 text-[24px] font-bold">Бусад мэдээ</h2>
+                </div>
+                <span className="text-[14px] text-muted-foreground">
+                  {rest.length} мэдээ
+                </span>
+              </motion.div>
+            )}
 
-                <p className="mt-3 flex-1 text-[14px] leading-relaxed text-muted-foreground">
-                  {item.excerpt}
-                </p>
-
-                <Link
-                  href={`/news/${item._id}`}
-                  className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary transition-colors"
+            {/* News grid */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              variants={containerVariants}
+              className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+            >
+              {rest.map((item) => (
+                <motion.article
+                  key={item._id}
+                  variants={itemVariants}
+                  className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
                 >
-                  {t("news.readMore")}
-                  <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  </div>
+
+                  <div className="flex flex-1 flex-col p-6">
+                    <div className="flex items-center gap-3 text-[12px] text-muted-foreground">
+                      <span className="font-semibold text-primary">{item.category}</span>
+                      {item.date && (
+                        <>
+                          <span className="h-1 w-1 rounded-full bg-muted-foreground" />
+                          <span>{item.date}</span>
+                        </>
+                      )}
+                    </div>
+
+                    <h3 className="mt-3 text-[18px] font-semibold leading-snug transition-colors group-hover:text-primary">
+                      {item.title}
+                    </h3>
+
+                    <p className="mt-3 flex-1 text-[14px] leading-relaxed text-muted-foreground">
+                      {item.excerpt}
+                    </p>
+                  </div>
+                </motion.article>
+              ))}
+            </motion.div>
+
+            {/* CTA */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              variants={sectionVariants}
+              className="mt-20 rounded-2xl bg-primary p-8 text-white sm:p-10 lg:p-12"
+            >
+              <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+                <div>
+                  <h3 className="text-[22px] font-bold sm:text-[26px]">
+                    Мэдээний мэдээлэл тогтмол хүлээн авахыг хүсэж байна уу?
+                  </h3>
+                  <p className="mt-2 max-w-xl text-[15px] text-white/70">
+                    Бидний шинэ бүтээгдэхүүн, урамшуулал, мэдээ мэдээллийг цаг алдалгүй хүлээн аваарай.
+                  </p>
+                </div>
+                <Link
+                  href="/contact"
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white px-6 py-3 text-[14px] font-semibold text-primary transition-colors hover:bg-white/90"
+                >
+                  Холбогдох
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-            </motion.article>
-          ))}
-        </motion.div>
-
-        {/* CTA */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-80px" }}
-          variants={sectionVariants}
-          className="mt-20 rounded-2xl bg-primary p-8 text-white sm:p-10 lg:p-12"
-        >
-          <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
-            <div>
-              <h3 className="text-[22px] font-bold sm:text-[26px]">
-                Мэдээний мэдээлэл тогтмол хүлээн авахыг хүсэж байна уу?
-              </h3>
-              <p className="mt-2 max-w-xl text-[15px] text-white/70">
-                Бидний шинэ бүтээгдэхүүн, урамшуулал, мэдээ мэдээллийг цаг алдалгүй хүлээн аваарай.
-              </p>
-            </div>
-            <Link
-              href="/contact"
-              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white px-6 py-3 text-[14px] font-semibold text-primary transition-colors hover:bg-white/90"
-            >
-              Холбогдох
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </motion.div>
+            </motion.div>
+          </>
+        )}
       </div>
     </div>
   );

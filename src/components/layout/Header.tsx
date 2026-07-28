@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useAtom } from "jotai";
+import { useQuery } from "@apollo/client/react";
 import { Link, usePathname } from "@/i18n/routing";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { cartCountAtom } from "@/store/cart.store";
 import { wishlistCountAtom } from "@/store/wishlist.store";
+import { CP_MENUS, type CpMenusData } from "@/graphql/cms/queries/menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Image from "@/components/common/Image";
@@ -14,18 +16,32 @@ import { Menu, ShoppingBag, User, Heart } from "lucide-react";
 
 export function Header() {
   const t = useTranslations();
+  const locale = useLocale();
   const pathname = usePathname();
   const { user } = useAuth();
   const [cartCount] = useAtom(cartCountAtom);
   const [wishlistCount] = useAtom(wishlistCountAtom);
   const [open, setOpen] = useState(false);
 
-  const navItems = [
+  const { data: menuData } = useQuery<CpMenusData>(CP_MENUS, {
+    variables: { language: locale, kind: "header" },
+    fetchPolicy: "cache-first",
+  });
+
+  const cmsNavItems = (menuData?.cpMenus ?? [])
+    .slice()
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .map((item) => ({ label: item.label ?? "", href: item.url ?? "/" }))
+    .filter((item) => item.label);
+
+  const fallbackNavItems = [
     { label: t("nav.home"), href: "/" },
     { label: t("nav.products"), href: "/products" },
     { label: t("nav.news"), href: "/news" },
     { label: t("nav.contact"), href: "/contact" },
   ];
+
+  const navItems = cmsNavItems.length > 0 ? cmsNavItems : fallbackNavItems;
 
   const isActive = (href: string) => pathname === href;
 

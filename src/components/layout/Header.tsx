@@ -5,7 +5,8 @@ import { useTranslations } from "next-intl";
 import { useAtom } from "jotai";
 import { Link, usePathname } from "@/i18n/routing";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { cartItemsAtom } from "@/store/cart.store";
+import { cartCountAtom } from "@/store/cart.store";
+import { wishlistCountAtom } from "@/store/wishlist.store";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Image from "@/components/common/Image";
@@ -15,7 +16,8 @@ export function Header() {
   const t = useTranslations();
   const pathname = usePathname();
   const { user } = useAuth();
-  const [cartItems] = useAtom(cartItemsAtom);
+  const [cartCount] = useAtom(cartCountAtom);
+  const [wishlistCount] = useAtom(wishlistCountAtom);
   const [open, setOpen] = useState(false);
 
   const navItems = [
@@ -50,14 +52,19 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-4">
-          <Link href="/wishlist" className="hidden lg:block">
+          <Link href="/wishlist" className="relative hidden lg:block">
             <Heart className="h-[18px] w-[18px]" />
+            {wishlistCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-white">
+                {wishlistCount}
+              </span>
+            )}
           </Link>
           <Link href="/cart" className="relative">
             <ShoppingBag className="h-[18px] w-[18px]" />
-            {cartItems.length > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center bg-foreground text-[10px] text-background">
-                {cartItems.reduce((sum, item) => sum + item.count, 0)}
+            {cartCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-white">
+                {cartCount}
               </span>
             )}
           </Link>

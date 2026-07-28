@@ -671,7 +671,7 @@ export default function ProductDetailPage({
   const product = MOCK_PRODUCTS[productId];
 
   const [, setCartItems] = useAtom(cartItemsAtom);
-  const [, setWishlistItems] = useAtom(wishlistItemsAtom);
+  const [wishlistItems, setWishlistItems] = useAtom(wishlistItemsAtom);
   const { user } = useAuth();
 
   const addToCart = () => {
@@ -698,11 +698,13 @@ export default function ProductDetailPage({
     setTimeout(() => setIsPending(false), 400);
   };
 
-  const addToWishlist = () => {
-    if (!product || !user?._id) return;
-    setWishlistItems((prev) => {
-      if (prev.find((item) => item.productId === product._id)) return prev;
-      return [
+  const toggleWishlist = () => {
+    if (!product) return;
+    const existing = wishlistItems.find((item) => item.productId === product._id);
+    if (existing) {
+      setWishlistItems((prev) => prev.filter((item) => item.productId !== product._id));
+    } else {
+      setWishlistItems((prev) => [
         ...prev,
         {
           productId: product._id,
@@ -710,9 +712,11 @@ export default function ProductDetailPage({
           unitPrice: product.unitPrice,
           productImgUrl: product.attachment?.url,
         },
-      ];
-    });
+      ]);
+    }
   };
+
+  const isInWishlist = wishlistItems.some((item) => item.productId === product._id);
 
   if (!product) {
     return (
@@ -807,11 +811,13 @@ export default function ProductDetailPage({
             </Button>
             <Button
               variant="ghost"
-              onClick={addToWishlist}
-              className="h-12 w-full gap-2 text-[14px] font-semibold uppercase tracking-wider"
+              onClick={toggleWishlist}
+              className={`h-12 w-full gap-2 text-[14px] font-semibold uppercase tracking-wider ${
+                isInWishlist ? "text-red-500 hover:text-red-600" : ""
+              }`}
             >
-              <Heart className="h-4 w-4" />
-              {t("product.addToWishlist")}
+              <Heart className={`h-4 w-4 ${isInWishlist ? "fill-current" : ""}`} />
+              {isInWishlist ? "Дуртайд нэмсэн" : t("product.addToWishlist")}
             </Button>
           </div>
 

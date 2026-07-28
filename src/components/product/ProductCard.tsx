@@ -4,10 +4,12 @@ import { motion } from "framer-motion";
 import { useAtom } from "jotai";
 import { Link } from "@/i18n/routing";
 import { cartItemsAtom } from "@/store/cart.store";
+import { wishlistItemsAtom } from "@/store/wishlist.store";
 import { formatPrice } from "@/lib/utils";
 import Image from "@/components/common/Image";
 import { Button } from "@/components/ui/button";
 import type { Product } from "@/graphql/ecommerce/queries/product";
+import { Heart } from "lucide-react";
 
 export function ProductCard({
   product,
@@ -19,6 +21,7 @@ export function ProductCard({
   index?: number;
 }) {
   const [cartItems, setCartItems] = useAtom(cartItemsAtom);
+  const [wishlistItems, setWishlistItems] = useAtom(wishlistItemsAtom);
 
   const addToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -46,6 +49,27 @@ export function ProductCard({
     }
   };
 
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const existing = wishlistItems.find((item) => item.productId === product._id);
+    if (existing) {
+      setWishlistItems((prev) => prev.filter((item) => item.productId !== product._id));
+    } else {
+      setWishlistItems((prev) => [
+        ...prev,
+        {
+          productId: product._id,
+          productName: product.name,
+          unitPrice: product.unitPrice,
+          productImgUrl: product.attachment?.url,
+        },
+      ]);
+    }
+  };
+
+  const isInWishlist = wishlistItems.some((item) => item.productId === product._id);
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 16 }}
@@ -64,6 +88,17 @@ export function ProductCard({
           fill
           className="object-contain p-6 transition-transform duration-300 ease-out group-hover:scale-[1.04]"
         />
+        <button
+          onClick={toggleWishlist}
+          className={`absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full shadow-sm transition-colors ${
+            isInWishlist
+              ? "bg-red-50 text-red-500"
+              : "bg-white/90 text-muted-foreground hover:bg-red-50 hover:text-red-500"
+          }`}
+          aria-label="Дуртайд нэмэх"
+        >
+          <Heart className={`h-4 w-4 ${isInWishlist ? "fill-current" : ""}`} />
+        </button>
       </Link>
 
       <div className="flex flex-col gap-1.5 px-1">

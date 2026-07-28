@@ -72,6 +72,7 @@ const itemVariants = {
 
 type NewsItem = {
   _id: string;
+  slug: string;
   title: string;
   excerpt: string;
   image: string;
@@ -96,10 +97,11 @@ export default function NewsPage() {
   });
 
   const items: NewsItem[] = useMemo(() => {
-    const posts: Post[] = data?.cpPosts ?? [];
+    const posts: Post[] = (data?.cpPosts ?? []).filter((post) => post.type === "post");
     if (posts.length > 0) {
       return posts.map((post, i) => ({
         _id: post._id,
+        slug: post.slug ?? post._id,
         title: post.title ?? "",
         excerpt: post.excerpt ?? "",
         image: post.thumbnail?.url ?? FALLBACK_IMAGES[i % FALLBACK_IMAGES.length],
@@ -109,6 +111,7 @@ export default function NewsPage() {
     }
     return FALLBACK_NEWS.map((item, i) => ({
       ...item,
+      slug: item._id,
       date: ["2024.12.15", "2024.12.08", "2024.11.28", "2024.11.15"][i],
     }));
   }, [data, t]);
@@ -175,7 +178,7 @@ export default function NewsPage() {
                 variants={sectionVariants}
                 className="mt-10 lg:mt-14"
               >
-                <div className="group block overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow duration-300 hover:shadow-md">
+                <Link href={`/news/${featured.slug}`} className="group block overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow duration-300 hover:shadow-md">
                   <article className="grid grid-cols-1 lg:grid-cols-2">
                     <div className="relative aspect-[16/10] overflow-hidden lg:aspect-auto">
                       <Image
@@ -209,9 +212,14 @@ export default function NewsPage() {
                       <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
                         {featured.excerpt}
                       </p>
+
+                      <span className="mt-6 inline-flex items-center gap-2 text-[14px] font-semibold text-primary">
+                        {t("news.readMore")}
+                        <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                      </span>
                     </div>
                   </article>
-                </div>
+                </Link>
               </motion.div>
             )}
 
@@ -245,41 +253,47 @@ export default function NewsPage() {
               className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
             >
               {rest.map((item) => (
-                <motion.article
-                  key={item._id}
-                  variants={itemVariants}
-                  className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
-                >
-                  <div className="relative aspect-[16/10] overflow-hidden">
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  </div>
-
-                  <div className="flex flex-1 flex-col p-6">
-                    <div className="flex items-center gap-3 text-[12px] text-muted-foreground">
-                      <span className="font-semibold text-primary">{item.category}</span>
-                      {item.date && (
-                        <>
-                          <span className="h-1 w-1 rounded-full bg-muted-foreground" />
-                          <span>{item.date}</span>
-                        </>
-                      )}
+                <motion.div key={item._id} variants={itemVariants}>
+                  <Link
+                    href={`/news/${item.slug}`}
+                    className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     </div>
 
-                    <h3 className="mt-3 text-[18px] font-semibold leading-snug transition-colors group-hover:text-primary">
-                      {item.title}
-                    </h3>
+                    <div className="flex flex-1 flex-col p-6">
+                      <div className="flex items-center gap-3 text-[12px] text-muted-foreground">
+                        <span className="font-semibold text-primary">{item.category}</span>
+                        {item.date && (
+                          <>
+                            <span className="h-1 w-1 rounded-full bg-muted-foreground" />
+                            <span>{item.date}</span>
+                          </>
+                        )}
+                      </div>
 
-                    <p className="mt-3 flex-1 text-[14px] leading-relaxed text-muted-foreground">
-                      {item.excerpt}
-                    </p>
-                  </div>
-                </motion.article>
+                      <h3 className="mt-3 text-[18px] font-semibold leading-snug transition-colors group-hover:text-primary">
+                        {item.title}
+                      </h3>
+
+                      <p className="mt-3 flex-1 text-[14px] leading-relaxed text-muted-foreground">
+                        {item.excerpt}
+                      </p>
+
+                      <span className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary">
+                        {t("news.readMore")}
+                        <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                      </span>
+                    </div>
+                  </Link>
+                </motion.div>
               ))}
             </motion.div>
 

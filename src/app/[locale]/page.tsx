@@ -11,16 +11,13 @@ import Image from "@/components/common/Image";
 import { Truck, ShieldCheck, Headphones, Lock, ArrowRight, ShoppingBag, Check, Clock, Mail, Phone, Send } from "lucide-react";
 import type { Product } from "@/graphql/ecommerce/queries/product";
 import { CP_PAGES, type CpPagesData } from "@/graphql/cms/queries/page";
+import { CP_POSTS, type CpPostsData, type Post } from "@/graphql/cms/queries/post";
+import { postToProduct, getPostCategory } from "./products/page";
 import { cartItemsAtom } from "@/store/cart.store";
 import { useAtom } from "jotai";
 import { formatPrice } from "@/lib/utils";
 
-const FEATURED_PRODUCTS: Product[] = [
-  { _id: "block-khoos", name: "БЛОКНЫ ХӨӨС", unitPrice: 45000, attachment: { url: "/images/products/block-foam.jpg" } },
-  { _id: "khoosnii-buu", name: "ХӨӨСНИЙ БУУ", unitPrice: 75000, attachment: { url: "/images/products/foam-gun.jpg" } },
-  { _id: "mako2", name: "МАКО 2 ОНГОЙЛТЫН ТҮГЖЭЭ", unitPrice: 85000, attachment: { url: "/images/products/mako2.jpg" } },
-  { _id: "tavtsan-40", name: "ХУВАНЦАР ТАВЦАН 40СМ", unitPrice: 180000, attachment: { url: "/images/products/tavtsan.jpg" } },
-];
+const FEATURED_SLUGS = ["block-khoos", "khoosnii-buu", "mako2", "tavtsan-40"];
 
 const CATEGORIES = [
   { name: "Хөөс", slug: "Хөөс", image: "/images/products/foam.jpg" },
@@ -123,7 +120,20 @@ export default function HomePage() {
     fetchPolicy: "cache-first",
   });
 
+  const { data: postsData } = useQuery<CpPostsData>(CP_POSTS, {
+    variables: { language: locale, status: "published", limit: 100 },
+    fetchPolicy: "cache-first",
+  });
+
   const homePage = pagesData?.cpPages?.find((page) => page.slug === "home");
+
+  const featuredProducts: Product[] = FEATURED_SLUGS.map((slug) => {
+    const post = (postsData?.cpPosts ?? []).find(
+      (p: Post) => p.type === "product" && p.slug === slug
+    );
+    if (post) return postToProduct(post);
+    return { _id: slug, name: slug, unitPrice: 0 };
+  });
 
   return (
     <div className="flex flex-col">
@@ -275,7 +285,7 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURED_PRODUCTS.map((product, i) => (
+          {featuredProducts.map((product, i) => (
             <FeaturedProductCard key={product._id} product={product} index={i} />
           ))}
         </div>

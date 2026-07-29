@@ -8,8 +8,9 @@ export type Deal = {
   closeDate?: string;
   description?: string;
   status?: string;
-  productsData?: unknown;
+  productsData?: DealProductData[];
   paymentsData?: unknown;
+  createdAt?: string;
 };
 
 export const CP_DEALS = gql`
@@ -29,12 +30,18 @@ export const CP_DEALS = gql`
       limit: $limit
       cursor: $cursor
     ) {
-      _id
-      name
-      stageId
-      startDate
-      closeDate
-      status
+      list {
+        _id
+        name
+        stageId
+        startDate
+        closeDate
+        status
+        description
+        productsData
+        createdAt
+      }
+      totalCount
     }
   }
 `;
@@ -48,8 +55,18 @@ export type CpDealsVariables = {
   cursor?: string;
 };
 
+export type DealProductData = {
+  productId?: string;
+  quantity?: number;
+  unitPrice?: number;
+  amount?: number;
+};
+
 export type CpDealsData = {
-  cpDeals: Deal[];
+  cpDeals: {
+    list: Deal[];
+    totalCount: number;
+  };
 };
 
 export const CP_DEAL_DETAIL = gql`

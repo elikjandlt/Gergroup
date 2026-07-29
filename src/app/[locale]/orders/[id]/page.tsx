@@ -1,12 +1,17 @@
 "use client";
 
+import { use } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import { useQuery } from "@apollo/client/react";
-import { CP_ORDER_DETAIL, type CpOrderDetailData } from "@/graphql/ecommerce/queries/order";
-import { useAuth } from "@/lib/auth/AuthContext";
-import { formatPrice } from "@/lib/utils";
+import { CP_DEALS, type CpDealsData, type Deal } from "@/graphql/hotel/queries/booking";
 import { Button } from "@/components/ui/button";
+import { PageLoader } from "@/components/common/Loader";
+import { ArrowLeft, Package, Truck } from "lucide-react";
+
+function formatMnt(value: number): string {
+  return `${value.toLocaleString("mn-MN")} ₮`;
+}
 
 export default function OrderDetailPage({
   params,
@@ -15,83 +20,112 @@ export default function OrderDetailPage({
 }) {
   const t = useTranslations();
   const router = useRouter();
-  const { user } = useAuth();
-  const { id: orderId } = params as unknown as { id: string };
+  const { id: orderId } = use(params);
 
-  const { data, loading } = useQuery<CpOrderDetailData>(CP_ORDER_DETAIL, {
-    variables: { id: orderId, customerId: user?._id || "" },
-    skip: !orderId || !user?._id,
+  const { data, loading } = useQuery<CpDealsData>(CP_DEALS, {
+    variables: { limit: 100 },
+    fetchPolicy: "cache-and-network",
   });
 
-  const order = data?.cpOrderDetail;
+  const deal = (data?.cpDeals?.list ?? []).find((d: Deal) => d._id === orderId);
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-[1440px] px-10 py-16">{t("common.loading")}</div>
+      <div className="mx-auto flex h-96 max-w-[1440px] items-center justify-center px-10">
+        <PageLoader />
+      </div>
     );
   }
 
-  if (!order) {
+  if (!deal) {
     return (
-      <div className="mx-auto max-w-[1440px] px-10 py-16">{t("orders.notFound")}</div>
+      <div className="mx-auto flex min-h-[50vh] max-w-[1440px] flex-col items-start justify-center px-10 py-16">
+        <p className="text-[16px] text-muted-foreground">{t("orders.notFound")}</p>
+        <Button onClick={() => router.push("/orders")} className="mt-6 bg-primary text-white hover:bg-primary/90">
+          {t("orders.back")}
+        </Button>
+      </div>
     );
   }
 
-  const deliveryInfo = order.deliveryInfo as Record<string, string> | undefined;
+  const products = Array.isArray(deal.productsData) ? deal.productsData : [];
+  const total = products.reduce((sum, p) => sum + (Number(p?.amount) || 0), 0);
+  const descriptionLines = (deal.description ?? "").split("\n").filter(Boolean);
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-10 py-16">
+    <div className="mx-auto w-full max-w-[1440px] px-6 py-16 sm:px-10">
       <Button
         variant="ghost"
         onClick={() => router.push("/orders")}
-        className="mb-6 px-0 text-[13px] text-muted-foreground hover:text-foreground"
+        className="mb-6 gap-2 px-0 text-[14px] text-muted-foreground hover:text-foreground"
       >
-        ← {t("orders.back")}
+        <ArrowLeft className="h-4 w-4" />
+        {t("orders.back")}
       </Button>
-      <h1 className="mb-10 text-[28px] font-normal">
-        {t("orders.title")} #{order._id.slice(-6)}
-      </h1>
 
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-        <div className="border border-border p-6">
-          <h2 className="mb-6 text-[13px] uppercase tracking-wider">{t("checkout.summary")}</h2>
-          <div className="flex flex-col gap-3">
-            {(order.items || []).map((item, idx) => (
-              <div key={idx} className="flex justify-between text-[13px]">
-                <span>{item.productName} x {item.count}</span>
-                <span>{formatPrice((item.unitPrice || 0) * (item.count || 0))}</span>
+      <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-[28px] font-bold">{deal.name}</h1>
+        <span className="rounded-full bg-primary/10 px-4 py-1.5 text-[13px] font-semibold text-primary">
+          {deal.status === "active" ? "Шинэ захиалга" : deal.status}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        {/* Products */}
+        <div className="rounded-2xl bg-white p-8 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Package className="h-5 w-5" />
+            </div>
+            <h2 className="text-[18px] font-bold">{t("checkout.summary")}</h2>
+          </div>
+
+          <div className="mt-6 flex flex-col gap-4">
+            {products.map((item, idx) => (
+              <div key={idx} className="flex items-center justify-between text-[14px]">
+                <span className="text-muted-foreground">
+                  {item.productId} x {item.quantity}
+                </span>
+                <span className="font-semibold">{formatMnt(Number(item.amount) || 0)}</span>
               </div>
             ))}
           </div>
-          <div className="mt-6 flex justify-between border-t border-border pt-4 text-[15px]">
+
+          <div className="mt-6 flex justify-between border-t border-border pt-4 text-[18px] font-bold">
             <span>{t("cart.total")}</span>
-            <span>{formatPrice(order.totalAmount)}</span>
+            <span>{formatMnt(total)}</span>
           </div>
         </div>
 
-        <div className="border border-border p-6">
-          <h2 className="mb-6 text-[13px] uppercase tracking-wider">{t("checkout.delivery")}</h2>
-          <div className="flex flex-col gap-4 text-[13px]">
-            <div className="flex flex-col gap-1">
-              <span className="text-[11px] uppercase text-muted-foreground">{t("checkout.status")}</span>
-              <span className="uppercase">{order.status}</span>
+        {/* Delivery info */}
+        <div className="rounded-2xl bg-white p-8 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Truck className="h-5 w-5" />
             </div>
+            <h2 className="text-[18px] font-bold">{t("checkout.delivery")}</h2>
+          </div>
+
+          <div className="mt-6 flex flex-col gap-3">
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] uppercase text-muted-foreground">{t("orders.date")}</span>
-              <span>{order.createdAt ? new Date(order.createdAt).toLocaleDateString("mn-MN") : ""}</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {t("orders.date")}
+              </span>
+              <span className="text-[14px]">
+                {deal.createdAt
+                  ? new Date(deal.createdAt).toLocaleDateString("mn-MN", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : ""}
+              </span>
             </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[11px] uppercase text-muted-foreground">{t("checkout.firstName")}</span>
-              <span>{deliveryInfo?.firstName} {deliveryInfo?.lastName}</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[11px] uppercase text-muted-foreground">{t("checkout.phone")}</span>
-              <span>{deliveryInfo?.phone}</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[11px] uppercase text-muted-foreground">{t("checkout.address")}</span>
-              <span>{deliveryInfo?.address}</span>
-            </div>
+            {descriptionLines.map((line, idx) => (
+              <p key={idx} className="text-[14px] text-muted-foreground">
+                {line}
+              </p>
+            ))}
           </div>
         </div>
       </div>

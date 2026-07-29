@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useAtom } from "jotai";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { useMutation } from "@apollo/client/react";
 import { motion } from "framer-motion";
 import { cartItemsAtom, cartTotalAtom } from "@/store/cart.store";

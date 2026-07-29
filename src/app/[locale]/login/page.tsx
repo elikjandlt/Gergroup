@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { useMutation } from "@apollo/client/react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth/AuthContext";

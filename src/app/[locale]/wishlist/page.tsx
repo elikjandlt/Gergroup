@@ -3,7 +3,7 @@
 import { useAtom } from "jotai";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { motion } from "framer-motion";
 import { wishlistItemsAtom } from "@/store/wishlist.store";
 import { cartItemsAtom } from "@/store/cart.store";

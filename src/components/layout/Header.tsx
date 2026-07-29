@@ -48,7 +48,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-10">
-        <Link href="/" className="flex items-center gap-3 text-[20px] font-normal uppercase tracking-[4px] text-primary">
+        <Link href="/" className="flex items-center gap-3 text-[20px] font-bold uppercase tracking-[3px] text-primary">
           <Image src="/images/logo.png" alt="Гэр Групп ХХК" width={40} height={40} className="object-contain" unoptimized />
           Гэр Групп ХХК
         </Link>
@@ -58,7 +58,7 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className={`text-[13px] uppercase tracking-wider transition-opacity ${
+              className={`text-[14px] font-bold uppercase tracking-wider transition-opacity ${
                 isActive(item.href) ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -101,7 +101,7 @@ export function Header() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="text-[13px] uppercase tracking-wider"
+                    className="text-[15px] font-bold uppercase tracking-wider"
                   >
                     {item.label}
                   </Link>
@@ -109,14 +109,14 @@ export function Header() {
                 <Link
                   href="/wishlist"
                   onClick={() => setOpen(false)}
-                  className="text-[13px] uppercase tracking-wider"
+                  className="text-[15px] font-bold uppercase tracking-wider"
                 >
                   {t("nav.wishlist")}
                 </Link>
                 <Link
                   href={user ? "/profile" : "/login"}
                   onClick={() => setOpen(false)}
-                  className="text-[13px] uppercase tracking-wider"
+                  className="text-[15px] font-bold uppercase tracking-wider"
                 >
                   {user ? t("nav.profile") : t("nav.login")}
                 </Link>

@@ -8,6 +8,7 @@ import { Link, useRouter } from "@/i18n/routing";
 import Image from "@/components/common/Image";
 import { Button } from "@/components/ui/button";
 import { CP_POST, CP_POSTS, type CpPostData, type CpPostsData, type Post } from "@/graphql/cms/queries/post";
+import { isNewsPost } from "../page";
 import { ArrowLeft, ArrowRight, Calendar, ChevronRight } from "lucide-react";
 
 const FALLBACK_IMAGES = [
@@ -47,7 +48,7 @@ export default function NewsDetailPage({
   const post = data?.cpPost;
 
   const relatedPosts = (allPostsData?.cpPosts ?? [])
-    .filter((p: Post) => p.type === "post" && p.slug !== slug)
+    .filter((p: Post) => isNewsPost(p) && p.slug !== slug)
     .slice(0, 3);
 
   if (loading) {

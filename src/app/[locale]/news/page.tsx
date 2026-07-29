@@ -9,6 +9,19 @@ import Image from "@/components/common/Image";
 import { ArrowLeft, ArrowRight, Calendar, Clock, ChevronRight } from "lucide-react";
 import { CP_POSTS, type CpPostsData, type Post } from "@/graphql/cms/queries/post";
 
+function isNewsCategory(slug?: string | null, name?: string | null) {
+  if (!slug && !name) return false;
+  const s = (slug ?? "").toLowerCase();
+  const n = (name ?? "").toLowerCase();
+  return s.includes("medee") || s === "news" || n.includes("мэдээ");
+}
+
+export function isNewsPost(post: Post) {
+  if (post.type !== "post") return false;
+  if (!post.categories || post.categories.length === 0) return true;
+  return post.categories.some((cat) => isNewsCategory(cat.slug, cat.name));
+}
+
 const FALLBACK_NEWS = [
   {
     _id: "1",
@@ -97,7 +110,7 @@ export default function NewsPage() {
   });
 
   const items: NewsItem[] = useMemo(() => {
-    const posts: Post[] = (data?.cpPosts ?? []).filter((post) => post.type === "post");
+    const posts: Post[] = (data?.cpPosts ?? []).filter(isNewsPost);
     if (posts.length > 0) {
       return posts.map((post, i) => ({
         _id: post._id,

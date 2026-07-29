@@ -106,7 +106,7 @@ export default function NewsPage() {
 
   const { data, loading } = useQuery<CpPostsData>(CP_POSTS, {
     variables: { language: locale, status: "published", limit: 20 },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const items: NewsItem[] = useMemo(() => {

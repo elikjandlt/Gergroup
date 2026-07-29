@@ -37,12 +37,12 @@ export default function NewsDetailPage({
 
   const { data, loading } = useQuery<CpPostData>(CP_POST, {
     variables: { slug, language: locale },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const { data: allPostsData } = useQuery<CpPostsData>(CP_POSTS, {
     variables: { language: locale, status: "published", limit: 20 },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const post = data?.cpPost;

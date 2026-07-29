@@ -64,17 +64,17 @@ export default function ProductsPage() {
 
   const { data: pagesData } = useQuery<CpPagesData>(CP_PAGES, {
     variables: { language: locale },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const { data: postsData, loading } = useQuery<CpPostsData>(CP_POSTS, {
     variables: { language: locale, status: "published", limit: 100 },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const { data: categoriesData } = useQuery<CpCategoriesData>(CP_CATEGORIES, {
     variables: { language: locale },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const productsPage = pagesData?.cpPages?.find((p) => p.slug === "products");

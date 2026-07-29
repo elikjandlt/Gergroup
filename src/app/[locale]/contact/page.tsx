@@ -64,7 +64,7 @@ export default function ContactPage() {
 
   const { data: pagesData } = useQuery<CpPagesData>(CP_PAGES, {
     variables: { language: locale },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const contactPage = pagesData?.cpPages?.find((page) => page.slug === "contact");

@@ -25,7 +25,7 @@ export function Header() {
 
   const { data: menuData } = useQuery<CpMenusData>(CP_MENUS, {
     variables: { language: locale, kind: "header" },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const cmsNavItems = (menuData?.cpMenus ?? [])

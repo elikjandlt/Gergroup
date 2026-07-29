@@ -136,17 +136,17 @@ export default function HomePage() {
 
   const { data: pagesData } = useQuery<CpPagesData>(CP_PAGES, {
     variables: { language: locale },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const { data: postsData } = useQuery<CpPostsData>(CP_POSTS, {
     variables: { language: locale, status: "published", limit: 100 },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const { data: categoriesData } = useQuery<CpCategoriesData>(CP_CATEGORIES, {
     variables: { language: locale },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const homePage = pagesData?.cpPages?.find((page) => page.slug === "home");

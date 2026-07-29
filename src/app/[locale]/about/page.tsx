@@ -38,7 +38,7 @@ export default function AboutPage() {
 
   const { data, loading } = useQuery<CpPagesData>(CP_PAGES, {
     variables: { language: locale },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const cmsPage = useMemo(

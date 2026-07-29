@@ -42,7 +42,7 @@ export default function ProductDetailPage({
 
   const { data, loading } = useQuery<CpPostData>(CP_POST, {
     variables: { slug: productSlug, language: locale },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const product = data?.cpPost;

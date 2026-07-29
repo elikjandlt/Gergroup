@@ -80,12 +80,12 @@ export function Footer() {
 
   const { data: menuData } = useQuery<CpMenusData>(CP_MENUS, {
     variables: { language: locale, kind: "footer" },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const { data: pagesData } = useQuery<CpPagesData>(CP_PAGES, {
     variables: { language: locale },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   const contactPage = pagesData?.cpPages?.find((page) => page.slug === "contact");

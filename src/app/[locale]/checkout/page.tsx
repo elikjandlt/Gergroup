@@ -87,8 +87,9 @@ export default function CheckoutPage() {
       } else {
         setError("Захиалга үүсгэхэд алдаа гарлаа. Дахин оролдоно уу.");
       }
-    } catch {
-      setError("Захиалга үүсгэхэд алдаа гарлаа. Дахин оролдоно уу.");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "";
+      setError(`Захиалга үүсгэхэд алдаа гарлаа. Дахин оролдоно уу. ${message}`);
     }
   };
 

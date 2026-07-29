@@ -13,6 +13,41 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { formatPrice } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { Banknote, Landmark, QrCode, CreditCard, Wallet } from "lucide-react";
+
+const PAYMENT_METHODS = [
+  {
+    id: "cash",
+    label: "Бэлнээр хүлээлгэж өгөх",
+    description: "Бараа хүргэгдсэн үед курьерээс бэлнээр төлнө.",
+    icon: Banknote,
+  },
+  {
+    id: "transfer",
+    label: "Дансаар шилжүүлэх",
+    description: "Захиалга баталгаажсаны дараа дансанд шилжүүлнэ.",
+    icon: Landmark,
+  },
+  {
+    id: "qpay",
+    label: "QPay / SocialPay",
+    description: "Гар утасны банкны апп ашиглан QR код уншуулна.",
+    icon: QrCode,
+  },
+  {
+    id: "stripe",
+    label: "Картын төлбөр (Stripe)",
+    description: "Олон улсын Visa, MasterCard, Amex картаар төлнө.",
+    icon: CreditCard,
+  },
+  {
+    id: "paypal",
+    label: "PayPal",
+    description: "PayPal дансаар төлбөр хийнэ.",
+    icon: Wallet,
+  },
+];
 
 export default function CheckoutPage() {
   const t = useTranslations();
@@ -28,6 +63,7 @@ export default function CheckoutPage() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("cash");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -38,6 +74,8 @@ export default function CheckoutPage() {
       if (user.phone) setPhone(user.phone);
     }
   }, [user]);
+
+  const selectedPayment = PAYMENT_METHODS.find((m) => m.id === paymentMethod);
 
   const handleSubmit = async () => {
     if (items.length === 0) return;
@@ -58,6 +96,7 @@ export default function CheckoutPage() {
       email ? `Имэйл: ${email}` : "",
       `Хүргэлтийн хаяг: ${address}`,
       description ? `Тайлбар: ${description}` : "",
+      `Төлбөрийн хэлбэр: ${selectedPayment?.label}`,
       `Нийт дүн: ${formatPrice(total)}`,
     ]
       .filter(Boolean)
@@ -103,6 +142,7 @@ export default function CheckoutPage() {
       <h1 className="mb-10 text-[28px] font-normal">{t("checkout.title")}</h1>
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
         <div className="flex flex-col gap-8">
+          {/* Delivery info */}
           <div className="border border-border p-6">
             <h2 className="mb-6 text-[13px] uppercase tracking-wider">
               {t("checkout.delivery")}
@@ -138,14 +178,51 @@ export default function CheckoutPage() {
             </div>
           </div>
 
+          {/* Payment method */}
           <div className="border border-border p-6">
-            <h2 className="mb-4 text-[13px] uppercase tracking-wider">Хүргэлт</h2>
-            <p className="text-[13px] text-muted-foreground">
-              Улаанбаатар хотод үнэгүй хүргэлттэй. Захиалга баталгаажсаны дараа хүргэлтийн компани тантай холбогдоно.
-            </p>
+            <h2 className="mb-6 text-[13px] uppercase tracking-wider">
+              Төлбөрийн хэлбэр
+            </h2>
+            <div className="flex flex-col gap-3">
+              {PAYMENT_METHODS.map((method) => {
+                const selected = paymentMethod === method.id;
+                return (
+                  <button
+                    key={method.id}
+                    type="button"
+                    onClick={() => setPaymentMethod(method.id)}
+                    className={cn(
+                      "flex items-center gap-4 border p-4 text-left transition-colors",
+                      selected
+                        ? "border-primary bg-primary text-white"
+                        : "border-border bg-background hover:border-foreground"
+                    )}
+                  >
+                    <method.icon
+                      className={cn(
+                        "h-5 w-5 shrink-0",
+                        selected ? "text-white" : "text-muted-foreground"
+                      )}
+                    />
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[14px] font-semibold">{method.label}</span>
+                      <span
+                        className={cn(
+                          "text-[12px]",
+                          selected ? "text-white/70" : "text-muted-foreground"
+                        )}
+                      >
+                        {method.description}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
+        {/* Order summary */}
         <div className="border border-border p-6">
           <h2 className="mb-6 text-[13px] uppercase tracking-wider">
             {t("checkout.summary")}
@@ -162,9 +239,13 @@ export default function CheckoutPage() {
             <span>{t("cart.total")}</span>
             <span>{formatPrice(total)}</span>
           </div>
+          <div className="mt-4 flex justify-between text-[13px]">
+            <span className="text-muted-foreground">Төлбөрийн хэлбэр</span>
+            <span className="font-medium">{selectedPayment?.label}</span>
+          </div>
           {error && <p className="mt-4 text-[13px] text-destructive">{error}</p>}
           <Button
-            className="mt-8 w-full"
+            className="mt-8 w-full bg-primary text-white hover:bg-primary/90"
             onClick={handleSubmit}
             disabled={isSubmitting || !firstName || !phone || !address}
           >

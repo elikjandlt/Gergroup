@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useAtom } from "jotai";
 import { useRouter } from "@/i18n/routing";
-import { useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { motion } from "framer-motion";
 import { cartItemsAtom, cartTotalAtom } from "@/store/cart.store";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { CP_DEALS_ADD, type CpDealsAddData } from "@/graphql/hotel/mutations/booking";
+import { CP_PAGES, type CpPagesData } from "@/graphql/cms/queries/page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +17,23 @@ import { Textarea } from "@/components/ui/textarea";
 import Image from "@/components/common/Image";
 import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
-import { Truck, ArrowRight, Check, User, Mail, Phone, MapPin, Banknote, Landmark, QrCode, CreditCard, Wallet } from "lucide-react";
+import { Truck, ArrowRight, Check, User, Mail, Phone, MapPin, Banknote, Landmark, QrCode, CreditCard, Wallet, Copy } from "lucide-react";
+
+function getPageField(page: { customFieldsData?: Record<string, unknown> | unknown[] | null } | undefined, field: string): string {
+  const data = page?.customFieldsData;
+  if (Array.isArray(data)) {
+    const found = data.find(
+      (item) => item && typeof item === "object" && (item as { field?: string }).field === field
+    );
+    const value = (found as { value?: unknown } | undefined)?.value;
+    return typeof value === "string" ? value : "";
+  }
+  if (data && typeof data === "object") {
+    const value = (data as Record<string, unknown>)[field];
+    return typeof value === "string" ? value : "";
+  }
+  return "";
+}
 
 const PAYMENT_METHODS = [
   {
@@ -53,11 +70,22 @@ const PAYMENT_METHODS = [
 
 export default function CheckoutPage() {
   const t = useTranslations();
+  const locale = useLocale();
   const router = useRouter();
   const [items, setItems] = useAtom(cartItemsAtom);
   const [total] = useAtom(cartTotalAtom);
   const { user } = useAuth();
   const [addDeal, { loading: isSubmitting }] = useMutation<CpDealsAddData>(CP_DEALS_ADD);
+
+  const { data: pagesData } = useQuery<CpPagesData>(CP_PAGES, {
+    variables: { language: locale },
+    fetchPolicy: "cache-and-network",
+  });
+
+  const contactPage = pagesData?.cpPages?.find((page) => page.slug === "contact");
+  const bankName = getPageField(contactPage, "bankName") || "Худалдаа хөгжлийн банк";
+  const bankAccount = getPageField(contactPage, "bankAccount") || "4990 1234 5678 9012";
+  const receiverName = getPageField(contactPage, "receiverName") || "Гэр Групп ХХК";
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -303,6 +331,99 @@ export default function CheckoutPage() {
                   );
                 })}
               </div>
+
+              {/* Bank transfer details */}
+              {paymentMethod === "transfer" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-6 rounded-xl border border-dashed border-border bg-slate-50 p-6"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-col gap-2">
+                      <p className="text-[14px] font-semibold">
+                        {bankName}: <span className="text-primary">{bankAccount}</span>
+                      </p>
+                      <p className="text-[14px] text-muted-foreground">
+                        Хүлээн авагч: {receiverName}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard?.writeText(bankAccount.replace(/\s/g, ""))}
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-white text-muted-foreground transition-colors hover:text-foreground"
+                      aria-label="Хуулах"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <p className="mt-3 text-[12px] text-muted-foreground">
+                    Гүйлгээний утганд захиалгын дугаараа бичнэ үү.
+                  </p>
+                </motion.div>
+              )}
+
+              {/* QPay details */}
+              {paymentMethod === "qpay" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-6 flex flex-col items-center gap-4 rounded-xl border border-dashed border-border bg-slate-50 p-8"
+                >
+                  <p className="text-[14px] font-semibold">QPay/SocialPay QR код</p>
+                  <div className="flex h-44 w-44 items-center justify-center rounded-lg bg-white">
+                    <QrCode className="h-32 w-32 text-foreground" strokeWidth={0.6} />
+                  </div>
+                  <p className="text-center text-[12px] text-muted-foreground">
+                    Захиалга баталгаажсаны дараа QR код илгээнэ.
+                  </p>
+                </motion.div>
+              )}
+
+              {/* Stripe card form */}
+              {paymentMethod === "stripe" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-6 flex flex-col gap-4"
+                >
+                  <div className="flex flex-col gap-2">
+                    <Label className="text-[12px] font-medium uppercase tracking-wider text-muted-foreground">
+                      Картын дугаар
+                    </Label>
+                    <Input
+                      placeholder="0000 0000 0000 0000"
+                      className="h-12 rounded-lg border-border bg-slate-50 px-4"
+                      maxLength={19}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <Label className="text-[12px] font-medium uppercase tracking-wider text-muted-foreground">
+                        Хүчинтэй хугацаа
+                      </Label>
+                      <Input
+                        placeholder="MM / YY"
+                        className="h-12 rounded-lg border-border bg-slate-50 px-4"
+                        maxLength={7}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Label className="text-[12px] font-medium uppercase tracking-wider text-muted-foreground">
+                        CVC
+                      </Label>
+                      <Input
+                        placeholder="123"
+                        className="h-12 rounded-lg border-border bg-slate-50 px-4"
+                        maxLength={4}
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[12px] text-muted-foreground">
+                    Stripe интеграц хийгдээгүй. Зөвхөн UI дэмжлэг.
+                  </p>
+                </motion.div>
+              )}
             </div>
           </div>
 

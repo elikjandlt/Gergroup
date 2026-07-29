@@ -214,12 +214,6 @@ export default function HomePage() {
                   {t("hero.cta")}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link
-                  href="/about"
-                  className="inline-flex h-14 items-center gap-2 rounded-lg border border-white/30 px-8 text-[14px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-white/10"
-                >
-                  Бидний тухай
-                </Link>
               </div>
             </motion.div>
           </div>

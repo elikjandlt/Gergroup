@@ -5,6 +5,23 @@ import { useTranslations, useLocale } from "next-intl";
 import { useQuery } from "@apollo/client/react";
 import { Link } from "@/i18n/routing";
 import { CP_MENUS, type CpMenusData, type MenuItem } from "@/graphql/cms/queries/menu";
+import { CP_PAGES, type CpPagesData } from "@/graphql/cms/queries/page";
+
+function getPageField(page: { customFieldsData?: Record<string, unknown> | unknown[] | null } | undefined, field: string): string {
+  const data = page?.customFieldsData;
+  if (Array.isArray(data)) {
+    const found = data.find(
+      (item) => item && typeof item === "object" && (item as { field?: string }).field === field
+    );
+    const value = (found as { value?: unknown } | undefined)?.value;
+    return typeof value === "string" ? value : "";
+  }
+  if (data && typeof data === "object") {
+    const value = (data as Record<string, unknown>)[field];
+    return typeof value === "string" ? value : "";
+  }
+  return "";
+}
 
 const PhoneIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -57,13 +74,6 @@ const LinkedinIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const contactItems = [
-  { icon: PhoneIcon, label: "Утас", value: "11 433995", href: "tel:11433995" },
-  { icon: MailIcon, label: "Имэйл", value: "info@ubgroup.mn", href: "mailto:info@ubgroup.mn" },
-  { icon: MapPinIcon, label: "Хаяг", value: "Улаанбаатар, Монгол" },
-  { icon: ClockIcon, label: "Ажлын цаг", value: "Да-Ба 09:00 - 18:00" },
-];
-
 export function Footer() {
   const t = useTranslations();
   const locale = useLocale();
@@ -72,6 +82,30 @@ export function Footer() {
     variables: { language: locale, kind: "footer" },
     fetchPolicy: "cache-first",
   });
+
+  const { data: pagesData } = useQuery<CpPagesData>(CP_PAGES, {
+    variables: { language: locale },
+    fetchPolicy: "cache-first",
+  });
+
+  const contactPage = pagesData?.cpPages?.find((page) => page.slug === "contact");
+
+  const cmsPhone = getPageField(contactPage, "phone");
+  const cmsEmail = getPageField(contactPage, "email");
+  const cmsAddress = getPageField(contactPage, "address");
+  const cmsHours = getPageField(contactPage, "hours");
+  const cmsFacebook = getPageField(contactPage, "facebook");
+  const cmsInstagram = getPageField(contactPage, "instagram");
+
+  const contactItems = [
+    { icon: PhoneIcon, label: "Утас", value: cmsPhone || "11 433995", href: `tel:${(cmsPhone || "11433995").replace(/\s/g, "")}` },
+    { icon: MailIcon, label: "Имэйл", value: cmsEmail || "info@ubgroup.mn", href: `mailto:${cmsEmail || "info@ubgroup.mn"}` },
+    { icon: MapPinIcon, label: "Хаяг", value: cmsAddress || "Улаанбаатар, Монгол" },
+    { icon: ClockIcon, label: "Ажлын цаг", value: cmsHours || "Да-Ба 09:00 - 18:00" },
+  ];
+
+  const facebookUrl = cmsFacebook || "https://www.facebook.com/GerGroupLTD";
+  const instagramUrl = cmsInstagram || "https://www.instagram.com";
 
   const footerColumns = useMemo(() => {
     const items: MenuItem[] = menuData?.cpMenus ?? [];
@@ -180,7 +214,7 @@ export function Footer() {
             </span>
             <div className="flex flex-wrap gap-2">
               <a
-                href="https://www.facebook.com/GerGroupLTD"
+                href={facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
@@ -189,7 +223,7 @@ export function Footer() {
                 <FacebookIcon className="h-4 w-4" />
               </a>
               <a
-                href="https://www.instagram.com"
+                href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"

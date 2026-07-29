@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import { useQuery } from "@apollo/client/react";
@@ -12,10 +13,28 @@ import { Truck, ShieldCheck, Headphones, Lock, ArrowRight, ShoppingBag, Check, C
 import type { Product } from "@/graphql/ecommerce/queries/product";
 import { CP_PAGES, type CpPagesData } from "@/graphql/cms/queries/page";
 import { CP_POSTS, type CpPostsData, type Post } from "@/graphql/cms/queries/post";
+import { CP_CATEGORIES, type CpCategoriesData } from "@/graphql/cms/queries/category";
+import { isNewsCategory } from "./news/page";
 import { postToProduct, getPostCategory } from "./products/page";
 import { cartItemsAtom } from "@/store/cart.store";
 import { useAtom } from "jotai";
 import { formatPrice } from "@/lib/utils";
+
+function getPageField(page: { customFieldsData?: Record<string, unknown> | unknown[] | null } | undefined, field: string): string {
+  const data = page?.customFieldsData;
+  if (Array.isArray(data)) {
+    const found = data.find(
+      (item) => item && typeof item === "object" && (item as { field?: string }).field === field
+    );
+    const value = (found as { value?: unknown } | undefined)?.value;
+    return typeof value === "string" ? value : "";
+  }
+  if (data && typeof data === "object") {
+    const value = (data as Record<string, unknown>)[field];
+    return typeof value === "string" ? value : "";
+  }
+  return "";
+}
 
 const FEATURED_SLUGS = ["block-khoos", "khoosnii-buu", "mako2", "tavtsan-40"];
 
@@ -125,7 +144,34 @@ export default function HomePage() {
     fetchPolicy: "cache-first",
   });
 
+  const { data: categoriesData } = useQuery<CpCategoriesData>(CP_CATEGORIES, {
+    variables: { language: locale },
+    fetchPolicy: "cache-first",
+  });
+
   const homePage = pagesData?.cpPages?.find((page) => page.slug === "home");
+
+  const quoteTitle = getPageField(homePage, "quoteTitle") || t("home.newsletter");
+  const quoteText = getPageField(homePage, "quoteText") || t("home.newsletterText");
+
+  const cmsCategories = useMemo(() => {
+    const list = categoriesData?.cpCategories?.list ?? [];
+    const productCats = list.filter((cat) => !isNewsCategory(cat.slug, cat.name));
+    if (productCats.length === 0) return CATEGORIES;
+    const imageByName: Record<string, string> = {
+      "Хөөс": "/images/products/foam.jpg",
+      "Түгжээ": "/images/products/mako2.jpg",
+      "Хуванцар тавцан": "/images/products/tavtsan-category.jpg",
+      "Хуванцар амалгаа": "/images/products/amalgaa-category.jpg",
+      "Ус уур чийг тусгаарлагч": "/images/products/us-uur.jpg",
+      "Резин": "/images/products/rubber-category.jpg",
+    };
+    return productCats.map((cat) => ({
+      name: cat.name ?? "",
+      slug: cat.name ?? "",
+      image: imageByName[cat.name ?? ""] ?? "/images/products/foam.jpg",
+    }));
+  }, [categoriesData]);
 
   const featuredProducts: Product[] = FEATURED_SLUGS.map((slug) => {
     const post = (postsData?.cpPosts ?? []).find(
@@ -231,7 +277,7 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {CATEGORIES.map((cat, i) => (
+          {cmsCategories.map((cat, i) => (
             <motion.div
               key={cat.slug}
               initial={{ opacity: 0, y: 16 }}
@@ -306,10 +352,10 @@ export default function HomePage() {
               Мэргэжлийн зөвлөгөө
             </p>
             <h2 className="mt-3 text-[28px] font-bold leading-tight text-foreground sm:text-[32px]">
-              {t("home.newsletter")}
+              {quoteTitle}
             </h2>
             <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-              {t("home.newsletterText")}
+              {quoteText}
             </p>
 
             <div className="mt-8 flex flex-col gap-6">

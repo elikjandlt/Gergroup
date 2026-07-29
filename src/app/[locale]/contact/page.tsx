@@ -35,37 +35,21 @@ const LinkedinIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const contactInfo = [
-  {
-    label: "Имэйл",
-    value: "info@ubgroup.mn",
-    href: "mailto:info@ubgroup.mn",
-    icon: Mail,
-  },
-  {
-    label: "Утас",
-    value: "11 433995",
-    href: "tel:11433995",
-    icon: Phone,
-  },
-  {
-    label: "Хаяг",
-    value: "Улаанбаатар, Монгол",
-    icon: MapPin,
-  },
-  {
-    label: "Ажлын цаг",
-    value: "Да-Ба 09:00 - 18:00",
-    icon: Clock,
-  },
-];
-
-const socialLinks = [
-  { icon: FacebookIcon, href: "#", label: "Facebook" },
-  { icon: InstagramIcon, href: "#", label: "Instagram" },
-  { icon: YoutubeIcon, href: "#", label: "Youtube" },
-  { icon: LinkedinIcon, href: "#", label: "LinkedIn" },
-];
+function getPageField(page: { customFieldsData?: Record<string, unknown> | unknown[] | null } | undefined, field: string): string {
+  const data = page?.customFieldsData;
+  if (Array.isArray(data)) {
+    const found = data.find(
+      (item) => item && typeof item === "object" && (item as { field?: string }).field === field
+    );
+    const value = (found as { value?: unknown } | undefined)?.value;
+    return typeof value === "string" ? value : "";
+  }
+  if (data && typeof data === "object") {
+    const value = (data as Record<string, unknown>)[field];
+    return typeof value === "string" ? value : "";
+  }
+  return "";
+}
 
 export default function ContactPage() {
   const t = useTranslations();
@@ -84,6 +68,27 @@ export default function ContactPage() {
   });
 
   const contactPage = pagesData?.cpPages?.find((page) => page.slug === "contact");
+
+  const cmsPhone = getPageField(contactPage, "phone");
+  const cmsEmail = getPageField(contactPage, "email");
+  const cmsAddress = getPageField(contactPage, "address");
+  const cmsHours = getPageField(contactPage, "hours");
+  const cmsFacebook = getPageField(contactPage, "facebook");
+  const cmsInstagram = getPageField(contactPage, "instagram");
+
+  const contactInfo = [
+    { label: "Имэйл", value: cmsEmail || "info@ubgroup.mn", href: `mailto:${cmsEmail || "info@ubgroup.mn"}`, icon: Mail },
+    { label: "Утас", value: cmsPhone || "11 433995", href: `tel:${(cmsPhone || "11433995").replace(/\s/g, "")}`, icon: Phone },
+    { label: "Хаяг", value: cmsAddress || "Улаанбаатар, Монгол", icon: MapPin },
+    { label: "Ажлын цаг", value: cmsHours || "Да-Ба 09:00 - 18:00", icon: Clock },
+  ];
+
+  const socialLinks = [
+    { icon: FacebookIcon, href: cmsFacebook || "https://www.facebook.com/GerGroupLTD", label: "Facebook" },
+    { icon: InstagramIcon, href: cmsInstagram || "https://www.instagram.com", label: "Instagram" },
+    { icon: YoutubeIcon, href: "#", label: "Youtube" },
+    { icon: LinkedinIcon, href: "#", label: "LinkedIn" },
+  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

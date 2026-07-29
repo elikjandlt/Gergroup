@@ -35,11 +35,6 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
-    if (!user) {
-      sessionStorage.setItem("redirectAfterLogin", "/checkout");
-      router.push("/login");
-      return;
-    }
     router.push("/checkout");
   };
 
